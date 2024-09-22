@@ -23,15 +23,15 @@ typedef struct {
 // Exemplo de estrutura Registro (ajuste conforme necessário)
 typedef struct {
    int populacao;
-   int tamanho;
-   char uniMedida;
+   float tamanho;
+   char uniMedida[1];
    int velocidade;
    char nome[100];
    char nEspecie[100];
-   char habitat[50];
+   char habitat[100];
    char tipo[30];
    char dieta[30];
-   char alimento[30];
+   char alimento[100];
 
    char removido;
    int encadeamento;
@@ -41,6 +41,7 @@ typedef struct {
 void inicializa_cabecalho(Cabecalho *c);
 
 //leitura do arquivo CSV
-void lendo_csv(char *nomeCSV, FILE *nomeBin, Cabecalho *cabecalho);
-
+void lendo_csv(char *nomeCSV, FILE *bin,  Cabecalho *cabecalho);
+//void adiciona_registro(FILE *arquivo, Registro *novo_registro, Cabecalho *cabecalho);
+void arquivobin(FILE *nomebin, Registro registro);
 #endif
