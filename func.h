@@ -17,31 +17,41 @@ typedef struct {
     int nroRegRem;          // 4 bytes
     int nroPagDisco;        // 4 bytes
     int qttCompacta;        // 4 bytes
-    char padding[1578];         // Preenche o restante da página de disco com lixo
+    char padding[1600 - (sizeof(char) + 4 * sizeof(int))];       // Preenche o restante da página de disco com lixo
 } Cabecalho;
 
 // Exemplo de estrutura Registro (ajuste conforme necessário)
 typedef struct {
    int populacao;
    float tamanho;
-   char uniMedida[1];
+   char uniMedida;
    int velocidade;
-   char nome[100];
-   char nEspecie[100];
-   char habitat[100];
-   char tipo[30];
-   char dieta[30];
-   char alimento[100];
+   char *nome;
+   char *nEspecie;
+   char *habitat;
+   char *tipo;
+   char *dieta;
+   char *alimento;
 
    char removido;
    int encadeamento;
 
 } Registro;
 
+// -------- Funções Fornecidas -----------------
+void binarioNaTela(char *nomeArquivoBinario);
+
+void scan_quote_string(char *str);
+//----------------------------------------------
+
 void inicializa_cabecalho(Cabecalho *c);
 
 //leitura do arquivo CSV
 void lendo_csv(char *nomeCSV, FILE *bin,  Cabecalho *cabecalho);
-//void adiciona_registro(FILE *arquivo, Registro *novo_registro, Cabecalho *cabecalho);
-void arquivobin(FILE *nomebin, Registro registro);
+void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *c);
+
+// Função para recuperar todos os registros e mostrar na saída padrão (função 2)
+void recuperar_todos_os_registros(char *nomeBin);
+
+
 #endif
