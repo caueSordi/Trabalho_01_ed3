@@ -262,9 +262,9 @@ void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *cabecalho)
 
 
 // Função para recuperar todos os registros e mostrar na saída padrão (função 2)
-// registo:
-// quando status 1 da segmentation fault ( analisar isto : caue )
-// verificar quando status 0 ( mensagem de erro  esta correta )
+//registro
+// agora quando status 1 o arquivo é lido e da o print porem com dados problemáticos
+// estando fragmentados, parece que o codigo nao esta separando corretamente oq deveria ser cada variavel 
 // verificar se o registro foi logicamente removido
 void recuperar_todos_os_registros(char *nomeBin) {
     FILE *arquivo_binario = fopen(nomeBin, "rb");
@@ -370,6 +370,105 @@ void recuperar_todos_os_registros(char *nomeBin) {
 
     if (registros_encontrados == 0) {
         printf("Registro inexistente.\n");
+    }
+
+    fclose(arquivo_binario);
+}
+
+void buscar_registros_por_campo(char *nomeBin, int n) {
+    FILE *arquivo_binario = fopen(nomeBin, "rb");
+    if (arquivo_binario == NULL) {
+        printf("Falha no processamento do arquivo.\n");
+        return;
+    }
+
+    Cabecalho cabecalho;
+    if (fread(&cabecalho, sizeof(Cabecalho), 1, arquivo_binario) != 1) {
+        printf("Erro ao ler o cabeçalho do arquivo.\n");
+        fclose(arquivo_binario);
+        return;
+    }
+
+    // Verificar se o arquivo está consistente
+    if (cabecalho.status == '0') {
+        printf("Falha no processamento do arquivo: arquivo inconsistente.\n");
+        fclose(arquivo_binario);
+        return;
+    }
+
+    for (int i = 0; i < n; i++) {
+        char nomeCampo[30];
+        char valorCampo[100];
+        int registros_encontrados = 0;
+
+        // Lê o nome do campo e o valor do campo
+        scanf("%s", nomeCampo);
+        scan_quote_string(valorCampo); // Usa a função fornecida para tratar strings com aspas
+
+        Registro registro;
+        rewind(arquivo_binario); // Volta para o início do arquivo binário após o cabeçalho
+        fseek(arquivo_binario, sizeof(Cabecalho), SEEK_SET); // Pula o cabeçalho do arquivo binário
+
+        // Ler registros do arquivo binário
+        while (fread(&registro.removido, sizeof(char), 1, arquivo_binario) == 1) {
+            if (registro.removido == '1') {
+                // Pular registros removidos
+                fseek(arquivo_binario, sizeof(int) + sizeof(int) + sizeof(float) + sizeof(char) + sizeof(int) + 160, SEEK_CUR);
+                continue;
+            }
+
+            fread(&registro.encadeamento, sizeof(int), 1, arquivo_binario);
+            fread(&registro.populacao, sizeof(int), 1, arquivo_binario);
+            fread(&registro.tamanho, sizeof(float), 1, arquivo_binario);
+            fread(&registro.uniMedida, sizeof(char), 1, arquivo_binario);
+            fread(&registro.velocidade, sizeof(int), 1, arquivo_binario);
+
+            // Ler strings de tamanho variável (nome, dieta, habitat, tipo, etc.)
+            char buffer[100];
+            int tamanho_string;
+
+            // Ler e comparar o campo especificado
+            if (strcmp(nomeCampo, "nome") == 0) {
+                fread(&tamanho_string, sizeof(int), 1, arquivo_binario);
+                fread(buffer, sizeof(char), tamanho_string, arquivo_binario);
+                buffer[tamanho_string] = '\0';
+                if (strcmp(buffer, valorCampo) == 0) {
+                    printf("Nome: %s\n", buffer);
+                    registros_encontrados++;
+                }
+            } else if (strcmp(nomeCampo, "dieta") == 0) {
+                fread(&tamanho_string, sizeof(int), 1, arquivo_binario);
+                fread(buffer, sizeof(char), tamanho_string, arquivo_binario);
+                buffer[tamanho_string] = '\0';
+                if (strcmp(buffer, valorCampo) == 0) {
+                    printf("Dieta: %s\n", buffer);
+                    registros_encontrados++;
+                }
+            } else if (strcmp(nomeCampo, "habitat") == 0) {
+                fread(&tamanho_string, sizeof(int), 1, arquivo_binario);
+                fread(buffer, sizeof(char), tamanho_string, arquivo_binario);
+                buffer[tamanho_string] = '\0';
+                if (strcmp(buffer, valorCampo) == 0) {
+                    printf("Habitat: %s\n", buffer);
+                    registros_encontrados++;
+                }
+            } else if (strcmp(nomeCampo, "populacao") == 0) {
+                fread(&tamanho_string, sizeof(int), 1, arquivo_binario);
+                fread(buffer, sizeof(char), tamanho_string, arquivo_binario);
+                buffer[tamanho_string] = '\0';
+                if (atoi(buffer) == atoi(valorCampo)) {
+                    printf("População: %s\n", buffer);
+                    registros_encontrados++;
+                }
+            } // continue comparando para outros campos, como tipo, velocidade, etc.
+
+            // Pular para o próximo registro no arquivo binário
+            fseek(arquivo_binario, sizeof(int) + sizeof(float) + sizeof(int) + 160, SEEK_CUR);
+        }
+
+        if (registros_encontrados == 0) {
+            printf("Registro inexistente.\n");
+        }
     }
 
     fclose(arquivo_binario);
