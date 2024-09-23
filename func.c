@@ -245,21 +245,30 @@ void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *cabecalho)
 
 
 // Função para recuperar todos os registros e mostrar na saída padrão (função 2)
+// registo:
+// quando status 1 da segmentation fault ( analisar isto : caue )
+// verificar quando status 0
 void recuperar_todos_os_registros(char *nomeBin) {
-    
     FILE *arquivo_binario = fopen(nomeBin, "rb");
     if (arquivo_binario == NULL) {
         printf("Falha no processamento do arquivo.\n");
         return;
     }
-    
+
     Cabecalho cabecalho;
-    fread(&cabecalho, sizeof(Cabecalho), 1, arquivo_binario);
+    
+    // Verificar se foi possível ler o cabeçalho
+    if (fread(&cabecalho, sizeof(Cabecalho), 1, arquivo_binario) != 1) {
+        printf("Erro ao ler o cabeçalho do arquivo.\n");
+        fclose(arquivo_binario);
+        return;
+    }
+
     printf("Status: %c\n", cabecalho.status);
 
     // Verificar se o arquivo está consistente
     if (cabecalho.status == '0') {
-        printf("Falha no processamento do arquivo.\n");
+        printf("Falha no processamento do arquivo: arquivo inconsistente.\n");
         fclose(arquivo_binario);
         return;
     }
@@ -269,8 +278,9 @@ void recuperar_todos_os_registros(char *nomeBin) {
 
     // Ler registros do arquivo binário
     while (fread(&registro, sizeof(Registro), 1, arquivo_binario) == 1) {
+        // Verificar se o registro foi logicamente removido
         if (registro.removido == '1') {
-            continue; // Pular registros removidos
+            continue; // Ignorar registros removidos
         }
 
         // Incrementa apenas para registros não removidos
@@ -285,7 +295,7 @@ void recuperar_todos_os_registros(char *nomeBin) {
         }
         printf("Tipo: %s\n", registro.tipo);
         if (registro.velocidade != -1) {
-            printf("Velocidade: %d %c/h\n", registro.velocidade, registro.uniMedida);
+            printf("Velocidade: %d %c/h\n", registro.velocidade, registro.uniMedida); // Ajustar para exibir apenas o primeiro caractere
         }
         if (registro.tamanho != -1) {
             printf("Tamanho: %.2f\n", registro.tamanho);
