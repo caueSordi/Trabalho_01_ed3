@@ -418,14 +418,14 @@ void recuperar_todos_os_registros(char *nomeBin) {
 
     fclose(arquivo_binario);
 }
-
-void buscar_registros_por_campo(char *nomeBin, int n) { // func 3 que busca registros por campo n vezes
+// Deu erro (verificar) porem função executando
+void buscar_registros_por_campo(char *nomeBin) { // func 3 que busca registros por campo n vezes
     FILE *arquivo_binario = fopen(nomeBin, "rb");
     if (arquivo_binario == NULL) {
         printf("Falha no processamento do arquivo.\n");
         return;
     }
-
+    int n =1;
     Cabecalho cabecalho;
     if (fread(&cabecalho, sizeof(Cabecalho), 1, arquivo_binario) != 1) {
         printf("Erro ao ler o cabeçalho do arquivo.\n");

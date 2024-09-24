@@ -52,4 +52,5 @@ void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *c);  // Fu
 // Função para recuperar todos os registros do arquivo binário e exibi-los na saída padrão
 void recuperar_todos_os_registros(char *nomeBin);
 
+void buscar_registros_por_campo(char *nomeBin);
 #endif

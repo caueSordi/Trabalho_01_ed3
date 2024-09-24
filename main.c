@@ -17,6 +17,7 @@ int main() {
     }
 
     // Leitura dos parâmetros de arquivos
+    printf("Digite o comando desejado:\n");
     scanf("%d", &comando);
     
     // Inicializa o cabeçalho
@@ -50,6 +51,14 @@ int main() {
         recuperar_todos_os_registros(nomearqbin);
         break;
     default:
+        break;
+
+    case 3:
+        //leitura do arquvio binario
+        scanf("%s", nomearqbin);
+        // Chama a função para recuperar e mostrar os registros
+        printf("Nome do arquivo binário: %s\n", nomearqbin);
+        buscar_registros_por_campo(nomearqbin);
         break;
     }
     
