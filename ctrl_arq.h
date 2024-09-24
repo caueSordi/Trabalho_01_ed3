@@ -4,19 +4,11 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "func.h"
 
 #define PAGE_SIZE 1600    // Definição do tamanho de página
 #define FILL_CHAR '$'     // Caractere de preenchimento
 
-// Estrutura de cabeçalho
-typedef struct {
-    char status;                // 1 byte
-    int topo;                   // 4 bytes
-    int proxRRN;                // 4 bytes
-    int nroRegRem;              // 4 bytes
-    int nroPagDisco;            // 4 bytes
-    int qttCompacta;            // 4 bytes
-} Cabecalho;
 
 // Função para inicializar e escrever o cabeçalho no arquivo binário
 void inicializa_cabecalho(Cabecalho *c, FILE* bin);

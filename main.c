@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include "func.h"
 #include <string.h>
+#include "ctrl_arq.h"
 
 int main() {
     
