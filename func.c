@@ -9,8 +9,8 @@
 
 
 //tasks
-// 1- garantir que arquivobin estaja escrevendo corretamente as strings
-//2 - garantir que a função recuperar_todos_os_registros esteja lendo e separando os campos corretamente
+// 1- garantir que arquivobin estaja escrevendo corretamente as strings - em observação
+//2 - garantir que a função recuperar_todos_os_registros esteja lendo e separando os campos corretamente - progresso
 // 3- garantir que a função buscar_registros_por_campo esteja lendo e separando os campos corretamente
 // 4-  revisar Podemos revisar o cálculo de quantos bytes foram escritos em cada registro e adicionar verificações para garantir que o tamanho final seja sempre 160 bytes
 
@@ -305,8 +305,6 @@ void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *c) {
 }
 
 
-
-
 // Função para recuperar todos os registros e mostrar na saída padrão (função 2)
 //registro
 // agora quando status 1 o arquivo é lido e da o print porem com dados problemáticos
@@ -421,7 +419,7 @@ void recuperar_todos_os_registros(char *nomeBin) {
     fclose(arquivo_binario);
 }
 
-void buscar_registros_por_campo(char *nomeBin, int n) {
+void buscar_registros_por_campo(char *nomeBin, int n) { // func 3 que busca registros por campo n vezes
     FILE *arquivo_binario = fopen(nomeBin, "rb");
     if (arquivo_binario == NULL) {
         printf("Falha no processamento do arquivo.\n");
@@ -441,7 +439,7 @@ void buscar_registros_por_campo(char *nomeBin, int n) {
         fclose(arquivo_binario);
         return;
     }
-
+// para cada n vezes ira ler o campo e o valor do campo
     for (int i = 0; i < n; i++) {
         char nomeCampo[30];
         char valorCampo[100];
@@ -515,7 +513,11 @@ void buscar_registros_por_campo(char *nomeBin, int n) {
         if (registros_encontrados == 0) {
             printf("Registro inexistente.\n");
         }
+
+
+
     }
+    
 
     fclose(arquivo_binario);
 }
