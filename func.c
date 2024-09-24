@@ -7,6 +7,14 @@
 #define PAGE_SIZE 1600 //tamanho de uma pagina do disco
 #define FILL_CHAR '$'
 
+
+//tasks
+// 1- garantir que arquivobin estaja escrevendo corretamente as strings
+//2 - garantir que a função recuperar_todos_os_registros esteja lendo e separando os campos corretamente
+// 3- garantir que a função buscar_registros_por_campo esteja lendo e separando os campos corretamente
+// 4-  revisar Podemos revisar o cálculo de quantos bytes foram escritos em cada registro e adicionar verificações para garantir que o tamanho final seja sempre 160 bytes
+
+
 // ------------ Funções Fornecidas --------------------------------------
 
 
@@ -86,63 +94,6 @@ void inicializa_cabecalho(Cabecalho *c) {
     memset(c->padding, FILL_CHAR, sizeof(c->padding));
     
 }
-void lendo_csv(char *nomeCSV, FILE *bin, Cabecalho *cabecalho) {
-    FILE *csvFile = fopen(nomeCSV, "r");
-    if (!csvFile) {
-        perror("Erro ao abrir o arquivo CSV");
-        return;
-    }
-
-    // Inicializa o cabeçalho
-    inicializa_cabecalho(cabecalho);
-
-    Registro registro;
-    
-    // Lê o arquivo CSV linha por linha
-    while (fscanf(csvFile, "%d,%f,%c,%d,%m[^\n]", 
-                  &registro.populacao, 
-                  &registro.tamanho, 
-                  &registro.uniMedida, 
-                  &registro.velocidade, 
-                  &registro.nome) == 5) {
-        
-        // Aqui você pode ler e alocar memória para os outros campos
-        // Exemplo de leitura e alocação para nEspecie
-        char *nEspecie = NULL;
-        char *habitat = NULL;
-        char *tipo = NULL;
-        char *dieta = NULL;
-        char *alimento = NULL;
-
-        fscanf(csvFile, ",%m[^\n]", &nEspecie);
-        fscanf(csvFile, ",%m[^\n]", &habitat);
-        fscanf(csvFile, ",%m[^\n]", &tipo);
-        fscanf(csvFile, ",%m[^\n]", &dieta);
-        fscanf(csvFile, ",%m[^\n]", &alimento);
-
-        // Atribuindo os valores lidos aos campos do registro
-        registro.nEspecie = nEspecie;
-        registro.habitat = habitat;
-        registro.tipo = tipo;
-        registro.dieta = dieta;
-        registro.alimento = alimento;
-
-        // Chama a função para gravar o registro no arquivo binário
-        arquivobin(bin, registro, 0, cabecalho); // Ajuste o valor de 'aux' conforme necessário
-
-        // Libera a memória alocada para strings
-        free(registro.nome);
-        free(nEspecie);
-        free(habitat);
-        free(tipo);
-        free(dieta);
-        free(alimento);
-    }
-
-    fclose(csvFile);
-}
-
-/*
 void lendo_csv(char *nomeCSV, FILE *nomeBin, Cabecalho *cabecalho) {
     Registro registro;
     
@@ -162,14 +113,13 @@ void lendo_csv(char *nomeCSV, FILE *nomeBin, Cabecalho *cabecalho) {
 
     //lendo o nome das colunas
     char buffer[100];
-    
     fgets(buffer, sizeof(buffer), arquivo_csv);
     //printf("%s\n", buffer);
     char *campo;
     while (fgets(linha, sizeof(linha), arquivo_csv)) {
         //printf("%s\n", linha);
         linha[strcspn(linha, "\n")] = '\0'; // Remove o caractere de nova linha
-        linha[strcspn(linha, "\r")] = '\0';
+        
         campo = strtok(linha, ",");
         // Nome
         if (campo != NULL) {
@@ -258,9 +208,9 @@ void lendo_csv(char *nomeCSV, FILE *nomeBin, Cabecalho *cabecalho) {
     //printf("%c\n", cabecalho->status);
     fclose(arquivo_csv);
 
-}*/
-void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *cabecalho) {
-    // Escreve campos de tamanho fixo
+}
+void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *c) {
+    // Escreve os campos de tamanho fixo
     fwrite(&registro.removido, sizeof(char), 1, nomebin);
     fwrite(&registro.encadeamento, sizeof(int), 1, nomebin);
     fwrite(&registro.populacao, sizeof(int), 1, nomebin);
@@ -268,59 +218,98 @@ void arquivobin(FILE *nomebin, Registro registro, int aux, Cabecalho *cabecalho)
     fwrite(&registro.uniMedida, sizeof(char), 1, nomebin);
     fwrite(&registro.velocidade, sizeof(int), 1, nomebin);
 
-    // Gravar o tamanho das strings e as próprias strings
-    int tamanho_nome = strlen(registro.nome);
-    fwrite(&tamanho_nome, sizeof(int), 1, nomebin);
-    fwrite(registro.nome, sizeof(char), tamanho_nome, nomebin);
-
-    int tamanho_dieta = strlen(registro.dieta);
-    fwrite(&tamanho_dieta, sizeof(int), 1, nomebin);
-    fwrite(registro.dieta, sizeof(char), tamanho_dieta, nomebin);
-
-    int tamanho_habitat = strlen(registro.habitat);
-    fwrite(&tamanho_habitat, sizeof(int), 1, nomebin);
-    fwrite(registro.habitat, sizeof(char), tamanho_habitat, nomebin);
-
-    int tamanho_tipo = strlen(registro.tipo);
-    fwrite(&tamanho_tipo, sizeof(int), 1, nomebin);
-    fwrite(registro.tipo, sizeof(char), tamanho_tipo, nomebin);
-
-    int tamanho_nEspecie = strlen(registro.nEspecie);
-    fwrite(&tamanho_nEspecie, sizeof(int), 1, nomebin);
-    fwrite(registro.nEspecie, sizeof(char), tamanho_nEspecie, nomebin);
-
-    int tamanho_alimento = strlen(registro.alimento);
-    fwrite(&tamanho_alimento, sizeof(int), 1, nomebin);
-    fwrite(registro.alimento, sizeof(char), tamanho_alimento, nomebin);
-
-    // Preenchendo o espaço restante com '$' até completar 160 bytes
+    // Variáveis para calcular o tamanho total escrito
     int tamanhoEscrito = sizeof(char)    // removido
                        + sizeof(int)     // encadeamento
                        + sizeof(int)     // populacao
                        + sizeof(float)   // tamanho
                        + sizeof(char)    // uniMedida
-                       + sizeof(int)     // velocidade
-                       + sizeof(int) + tamanho_nome
-                       + sizeof(int) + tamanho_dieta
-                       + sizeof(int) + tamanho_habitat
-                       + sizeof(int) + tamanho_tipo
-                       + sizeof(int) + tamanho_nEspecie
-                       + sizeof(int) + tamanho_alimento;
+                       + sizeof(int);    // velocidade
 
+    // Grava as strings de tamanho variável com seu tamanho e o delimitador '#'
+    if (registro.nome) {
+        int tamanho_nome = strlen(registro.nome);
+        fwrite(&tamanho_nome, sizeof(int), 1, nomebin); // Grava o tamanho
+        fwrite(registro.nome, sizeof(char), tamanho_nome, nomebin); // Grava a string
+        tamanhoEscrito += sizeof(int) + tamanho_nome;
+    } else {
+        int tamanho_nome = 0;
+        fwrite(&tamanho_nome, sizeof(int), 1, nomebin);
+        tamanhoEscrito += sizeof(int);
+    }
+
+    if (registro.dieta) {
+        int tamanho_dieta = strlen(registro.dieta);
+        fwrite(&tamanho_dieta, sizeof(int), 1, nomebin);
+        fwrite(registro.dieta, sizeof(char), tamanho_dieta, nomebin);
+        tamanhoEscrito += sizeof(int) + tamanho_dieta;
+    } else {
+        int tamanho_dieta = 0;
+        fwrite(&tamanho_dieta, sizeof(int), 1, nomebin);
+        tamanhoEscrito += sizeof(int);
+    }
+
+    if (registro.habitat) {
+        int tamanho_habitat = strlen(registro.habitat);
+        fwrite(&tamanho_habitat, sizeof(int), 1, nomebin);
+        fwrite(registro.habitat, sizeof(char), tamanho_habitat, nomebin);
+        tamanhoEscrito += sizeof(int) + tamanho_habitat;
+    } else {
+        int tamanho_habitat = 0;
+        fwrite(&tamanho_habitat, sizeof(int), 1, nomebin);
+        tamanhoEscrito += sizeof(int);
+    }
+
+    if (registro.tipo) {
+        int tamanho_tipo = strlen(registro.tipo);
+        fwrite(&tamanho_tipo, sizeof(int), 1, nomebin);
+        fwrite(registro.tipo, sizeof(char), tamanho_tipo, nomebin);
+        tamanhoEscrito += sizeof(int) + tamanho_tipo;
+    } else {
+        int tamanho_tipo = 0;
+        fwrite(&tamanho_tipo, sizeof(int), 1, nomebin);
+        tamanhoEscrito += sizeof(int);
+    }
+
+    if (registro.nEspecie) {
+        int tamanho_nEspecie = strlen(registro.nEspecie);
+        fwrite(&tamanho_nEspecie, sizeof(int), 1, nomebin);
+        fwrite(registro.nEspecie, sizeof(char), tamanho_nEspecie, nomebin);
+        tamanhoEscrito += sizeof(int) + tamanho_nEspecie;
+    } else {
+        int tamanho_nEspecie = 0;
+        fwrite(&tamanho_nEspecie, sizeof(int), 1, nomebin);
+        tamanhoEscrito += sizeof(int);
+    }
+
+    if (registro.alimento) {
+        int tamanho_alimento = strlen(registro.alimento);
+        fwrite(&tamanho_alimento, sizeof(int), 1, nomebin);
+        fwrite(registro.alimento, sizeof(char), tamanho_alimento, nomebin);
+        tamanhoEscrito += sizeof(int) + tamanho_alimento;
+    } else {
+        int tamanho_alimento = 0;
+        fwrite(&tamanho_alimento, sizeof(int), 1, nomebin);
+        tamanhoEscrito += sizeof(int);
+    }
+
+    // Preencher o restante dos 160 bytes com '$'
     int espacoRestante = 160 - tamanhoEscrito;
     if (espacoRestante > 0) {
         char preenchimento[espacoRestante];
-        memset(preenchimento, '$', espacoRestante);
+        memset(preenchimento, FILL_CHAR, espacoRestante);
         fwrite(preenchimento, sizeof(char), espacoRestante, nomebin);
     }
+
+    printf("Tamanho escrito: %d, Espaço restante: %d\n", tamanhoEscrito, espacoRestante);
 }
+
 
 
 
 // Função para recuperar todos os registros e mostrar na saída padrão (função 2)
 //registro
-// agora quando status 1 o arquivo  NAO ESTA SENDO MAIS LIDO CORRETAMENTE
-// pois o proprio binario nao esta sendo salvo corretamente
+// agora quando status 1 o arquivo é lido e da o print porem com dados problemáticos
 // estando fragmentados, parece que o codigo nao esta separando corretamente oq deveria ser cada variavel 
 // verificar se o registro foi logicamente removido
 void recuperar_todos_os_registros(char *nomeBin) {
@@ -346,62 +335,77 @@ void recuperar_todos_os_registros(char *nomeBin) {
     }
 
     Registro registro;
+    int registros_encontrados = 0;
+
     while (fread(&registro.removido, sizeof(char), 1, arquivo_binario) == 1) {
         // Verificar se o registro foi logicamente removido
         if (registro.removido == '1') {
-            // Pular para o próximo registro
-            fseek(arquivo_binario, 160 - sizeof(char), SEEK_CUR);
+            fseek(arquivo_binario, 160 - sizeof(char), SEEK_CUR); // Pular para o próximo registro
             continue; // Ignorar registros removidos
         }
 
-        // Ler os campos restantes do registro
         fread(&registro.encadeamento, sizeof(int), 1, arquivo_binario);
         fread(&registro.populacao, sizeof(int), 1, arquivo_binario);
         fread(&registro.tamanho, sizeof(float), 1, arquivo_binario);
         fread(&registro.uniMedida, sizeof(char), 1, arquivo_binario);
         fread(&registro.velocidade, sizeof(int), 1, arquivo_binario);
 
-        // Ler os tamanhos das strings
-        int tamanho_nome, tamanho_dieta, tamanho_habitat, tamanho_tipo, tamanho_nEspecie, tamanho_alimento;
-
-        fread(&tamanho_nome, sizeof(int), 1, arquivo_binario);
-        registro.nome = malloc((tamanho_nome + 1) * sizeof(char));
+        // Ler o tamanho e o conteúdo da string nome
+        int tamanho_nome;
+        if (fread(&tamanho_nome, sizeof(int), 1, arquivo_binario) != 1) break;
+        registro.nome = (char *)malloc(tamanho_nome + 1);
         fread(registro.nome, sizeof(char), tamanho_nome, arquivo_binario);
-        registro.nome[tamanho_nome] = '\0'; // Garantir que a string seja terminada corretamente
+        registro.nome[tamanho_nome] = '\0';  // Adicionar terminador nulo
 
-        fread(&tamanho_dieta, sizeof(int), 1, arquivo_binario);
-        registro.dieta = malloc((tamanho_dieta + 1) * sizeof(char));
+        // Ler a dieta
+        int tamanho_dieta;
+        if (fread(&tamanho_dieta, sizeof(int), 1, arquivo_binario) != 1) break;
+        registro.dieta = (char *)malloc(tamanho_dieta + 1);
         fread(registro.dieta, sizeof(char), tamanho_dieta, arquivo_binario);
         registro.dieta[tamanho_dieta] = '\0';
 
-        fread(&tamanho_habitat, sizeof(int), 1, arquivo_binario);
-        registro.habitat = malloc((tamanho_habitat + 1) * sizeof(char));
+        // Ler o habitat
+        int tamanho_habitat;
+        if (fread(&tamanho_habitat, sizeof(int), 1, arquivo_binario) != 1) break;
+        registro.habitat = (char *)malloc(tamanho_habitat + 1);
         fread(registro.habitat, sizeof(char), tamanho_habitat, arquivo_binario);
         registro.habitat[tamanho_habitat] = '\0';
 
-        fread(&tamanho_tipo, sizeof(int), 1, arquivo_binario);
-        registro.tipo = malloc((tamanho_tipo + 1) * sizeof(char));
+        // Ler o tipo
+        int tamanho_tipo;
+        if (fread(&tamanho_tipo, sizeof(int), 1, arquivo_binario) != 1) break;
+        registro.tipo = (char *)malloc(tamanho_tipo + 1);
         fread(registro.tipo, sizeof(char), tamanho_tipo, arquivo_binario);
         registro.tipo[tamanho_tipo] = '\0';
 
-        fread(&tamanho_nEspecie, sizeof(int), 1, arquivo_binario);
-        registro.nEspecie = malloc((tamanho_nEspecie + 1) * sizeof(char));
+        // Ler a espécie
+        int tamanho_nEspecie;
+        if (fread(&tamanho_nEspecie, sizeof(int), 1, arquivo_binario) != 1) break;
+        registro.nEspecie = (char *)malloc(tamanho_nEspecie + 1);
         fread(registro.nEspecie, sizeof(char), tamanho_nEspecie, arquivo_binario);
         registro.nEspecie[tamanho_nEspecie] = '\0';
 
-        fread(&tamanho_alimento, sizeof(int), 1, arquivo_binario);
-        registro.alimento = malloc((tamanho_alimento + 1) * sizeof(char));
+        // Ler o alimento
+        int tamanho_alimento;
+        if (fread(&tamanho_alimento, sizeof(int), 1, arquivo_binario) != 1) break;
+        registro.alimento = (char *)malloc(tamanho_alimento + 1);
         fread(registro.alimento, sizeof(char), tamanho_alimento, arquivo_binario);
         registro.alimento[tamanho_alimento] = '\0';
 
-        // Exibir o registro recuperado
-        printf("Registro: %s, %s, %s, %d, %c, %d, %.2f, %s, %s\n", 
-               registro.nome, registro.dieta, registro.habitat, 
-               registro.populacao, registro.uniMedida, 
-               registro.velocidade, registro.tamanho, 
-               registro.nEspecie, registro.alimento);
+        // Exibir os dados do registro
+        registros_encontrados++;
+        printf("Nome: %s\n", registro.nome);
+        printf("Dieta: %s\n", registro.dieta);
+        printf("Habitat: %s\n", registro.habitat);
+        printf("População: %d\n", registro.populacao);
+        printf("Tipo: %s\n", registro.tipo);
+        printf("Velocidade: %d %c/h\n", registro.velocidade, registro.uniMedida);
+        printf("Tamanho: %.2f\n", registro.tamanho);
+        printf("Espécie: %s\n", registro.nEspecie);
+        printf("Alimento: %s\n", registro.alimento);
+        printf("\n");
 
-        // Liberar memória alocada
+        // Libera memória alocada para strings
         free(registro.nome);
         free(registro.dieta);
         free(registro.habitat);
@@ -410,11 +414,13 @@ void recuperar_todos_os_registros(char *nomeBin) {
         free(registro.alimento);
     }
 
+    if (registros_encontrados == 0) {
+        printf("Registro inexistente.\n");
+    }
+
     fclose(arquivo_binario);
 }
 
-
-// Função para recuperar todos os registros e mostrar na saída padrão (função 2)
 void buscar_registros_por_campo(char *nomeBin, int n) {
     FILE *arquivo_binario = fopen(nomeBin, "rb");
     if (arquivo_binario == NULL) {

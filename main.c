@@ -49,7 +49,6 @@ int main() {
         // Chama a função para recuperar e mostrar os registros
         recuperar_todos_os_registros(nomearqbin);
         break;
-            
     default:
         break;
     }
