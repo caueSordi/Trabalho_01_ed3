@@ -30,10 +30,10 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin, Cabecalho *cabecalho){
 
             //escrita
             cabecalho_writebin(arquivo_binario,cabecalho);
-            printf("Status: %c\n", cabecalho->status);
+            //printf("Status: %c\n", cabecalho->status);
             while (!feof(arquivo_csv)) { //salva todos os dados em dino
                 Registro *dino = registro_readcsv(arquivo_csv);
-                
+
                 // Verifica se leu corretamente o registro
                 if (dino == NULL) {
                     printf("Erro ao ler o registro do CSV\n");
@@ -49,13 +49,7 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin, Cabecalho *cabecalho){
                 //qtt de registros
                 qtt++;
                 // Liberar a memória alocada para o registro
-                free(dino->nome);
-                free(dino->dieta);
-                free(dino->habitat);
-                free(dino->tipo);
-                free(dino->nEspecie);
-                free(dino->alimento);
-                free(dino);
+                //free(dino->nome);
             }
             
             // Verificação do cabeçalho
@@ -80,38 +74,22 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin, Cabecalho *cabecalho){
 void SELECT_TABLE(char *nomearqbin) {
     FILE *arquivo_binario = fopen(nomearqbin, "rb");
     if (arquivo_binario == NULL) {
-        printf("Falha ao abrir o arquivo.\n");
+        printf("Falha ao abrir o arquivo \n");
         return;
     }
 
-    int registros_encontrados = 0;  // Contador de registros encontrados
-    Registro *dino;
+    Registro registro;  // Estrutura para armazenar um registro
 
+    // Lê registros do arquivo binário
     while (1) {
-        dino = registro_readbin(arquivo_binario);
+        Registro *dino = registro_readbin(arquivo_binario);
         
         // Verifica se a leitura foi bem-sucedida
         if (dino == NULL) {
             break;  // Sai do loop se não houver mais registros para ler
         }
-
-        // Verifica se o registro foi logicamente removido
-        if (dino->removido == REGISTRO_REMOVIDO_TRUE) {
-            free(dino);  // Libera a memória alocada
-            continue;  // Ignora registros removidos
-        }
-
-        // Imprime o nome e os campos do registro
-        printf("Nome: %s\n", dino->nome);
-        registro_print(dino);  // Imprime os campos do registro
-        printf("\n"); // Linha em branco após cada registro
-
-        registros_encontrados++;
-        free(dino);  // Libera a memória alocada
-    }
-
-    if (registros_encontrados == 0) {
-        printf("Registro inexistente.\n");
+        
+        registro_print(dino);  // Imprime o registro lido
     }
 
     fclose(arquivo_binario); 

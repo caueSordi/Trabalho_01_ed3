@@ -15,10 +15,10 @@
 
     // Exemplo de estrutura Registro (ajuste conforme necessário)
     typedef struct {
-        int populacao;
-        float tamanho;
-        char uniMedida;
-        int velocidade;
+        int populacao; //4 bytes
+        float tamanho; // 4 bytes
+        char uniMedida; //1 byte
+        int velocidade; //4 bytes
         char *nome;
         char *nEspecie;
         char *habitat;
@@ -26,8 +26,8 @@
         char *dieta;
         char *alimento;
 
-        char removido;
-        int encadeamento;
+        char removido; //1 byte
+        int encadeamento; //4 bytes
         int tam_preenchimento;
 
     } Registro;
@@ -40,7 +40,6 @@
 
     // Função para imprimir os dados do registro
     void registro_print(Registro *registro);
-    void exibirRegistros(FILE *file);
 
     // Verifica se o campo é string ou inteiro
     bool registro_field(char *nome_campo);
@@ -78,5 +77,5 @@
     void registro_setAlimenta(Registro *registro, char *alimento);
     void registro_setRemovido(Registro *registro, bool removido);
     void registro_setEncadeamento(Registro *registro, int encadeamento);
-    
+
 #endif
