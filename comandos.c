@@ -80,22 +80,38 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin, Cabecalho *cabecalho){
 void SELECT_TABLE(char *nomearqbin) {
     FILE *arquivo_binario = fopen(nomearqbin, "rb");
     if (arquivo_binario == NULL) {
-        printf("Falha ao abrir o arquivo \n");
+        printf("Falha ao abrir o arquivo.\n");
         return;
     }
 
-    Registro registro;  // Estrutura para armazenar um registro
+    int registros_encontrados = 0;  // Contador de registros encontrados
+    Registro *dino;
 
-    // Lê registros do arquivo binário
     while (1) {
-        Registro *dino = registro_readbin(arquivo_binario);
+        dino = registro_readbin(arquivo_binario);
         
         // Verifica se a leitura foi bem-sucedida
         if (dino == NULL) {
             break;  // Sai do loop se não houver mais registros para ler
         }
-        
-        registro_print(dino);  // Imprime o registro lido
+
+        // Verifica se o registro foi logicamente removido
+        if (dino->removido == REGISTRO_REMOVIDO_TRUE) {
+            free(dino);  // Libera a memória alocada
+            continue;  // Ignora registros removidos
+        }
+
+        // Imprime o nome e os campos do registro
+        printf("Nome: %s\n", dino->nome);
+        registro_print(dino);  // Imprime os campos do registro
+        printf("\n"); // Linha em branco após cada registro
+
+        registros_encontrados++;
+        free(dino);  // Libera a memória alocada
+    }
+
+    if (registros_encontrados == 0) {
+        printf("Registro inexistente.\n");
     }
 
     fclose(arquivo_binario); 

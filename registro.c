@@ -4,9 +4,7 @@
 
 Registro *registro_readbin(FILE *file) {
     printf("Inicio da leitura\n");
-    // Lê o registro de um arquivo binário
-    // Não abrir o arquivo aqui, pois já foi passado como parâmetro
-     Registro *registro;
+
     Cabecalho cabecalho;
     // Lê o cabeçalho do arquivo
     if (fread(&cabecalho, sizeof(Cabecalho), 1, file) != 1) {
@@ -21,32 +19,44 @@ Registro *registro_readbin(FILE *file) {
         return NULL;  // Retorna NULL se o cabeçalho está inconsistente
     }
 
-    // Lê os registros
+    Registro *registro = (Registro *)malloc(sizeof(Registro));
+    if (!registro) {
+        printf("Erro de alocação de memória.\n");
+        return NULL;
+    }
+
     int registros_encontrados = 0;
-    
-    while(!feof(file)) {
+
+    // Lê os registros até o final do arquivo
+    while (fread(&registro->removido, sizeof(char), 1, file) == 1) {
         // Verifica se o registro foi logicamente removido
-        printf("Remov: %c\n", registro->removido);
+        printf("Removido: %c\n", registro->removido);
         if (registro->removido == '1') {
-            fseek(file, sizeof(int) + sizeof(int) + sizeof(float) + sizeof(char) + sizeof(int), SEEK_CUR); // Pula para o próximo registro
+            fseek(file, sizeof(int) + sizeof(int) + sizeof(float) + sizeof(char) + sizeof(int), SEEK_CUR);  // Pula o restante do registro
             continue;  // Ignora registros removidos
         }
 
+        // Lê os campos do registro
         fread(&registro->encadeamento, sizeof(int), 1, file);
         fread(&registro->populacao, sizeof(int), 1, file);
         fread(&registro->tamanho, sizeof(float), 1, file);
         fread(&registro->uniMedida, sizeof(char), 1, file);
         fread(&registro->velocidade, sizeof(int), 1, file);
 
-        registros_encontrados++; // Incrementa o contador de registros encontrados
+        registros_encontrados++;  // Incrementa o contador de registros encontrados
+
+        // Aqui você pode retornar ou processar o registro conforme necessário
+        printf("Registro encontrado: Encadeamento: %d, População: %d\n", registro->encadeamento, registro->populacao);
+        // Dependendo do seu fluxo, pode ser necessário retornar o registro agora ou continuar a leitura
     }
 
     if (registros_encontrados == 0) {
-        printf("Registro inexistente.\n");
-        return NULL;  // Retorna NULL se nenhum registro for encontrado
+        printf("Nenhum registro válido encontrado.\n");
+        free(registro);  // Libera a memória se nenhum registro foi encontrado
+        return NULL;
     }
 
-    return registro;  // Retorna o registro lido
+    return registro;  // Retorna o registro lido (se encontrado)
 }
 
 void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro no arquivo binário
@@ -404,7 +414,7 @@ void exibirRegistros(FILE *arquivo) {
         }
 
         printf("\n"); // Linha em branco após cada registro
-        numeroRegistros++; // Incrementa o contador de registros
+        numeroRegistros++; //
     }
 
     // Exibe o número de páginas de disco

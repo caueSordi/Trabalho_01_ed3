@@ -40,6 +40,7 @@
 
     // Função para imprimir os dados do registro
     void registro_print(Registro *registro);
+    void exibirRegistros(FILE *file);
 
     // Verifica se o campo é string ou inteiro
     bool registro_field(char *nome_campo);
@@ -77,5 +78,5 @@
     void registro_setAlimenta(Registro *registro, char *alimento);
     void registro_setRemovido(Registro *registro, bool removido);
     void registro_setEncadeamento(Registro *registro, int encadeamento);
-
+    
 #endif
