@@ -358,3 +358,55 @@ void registro_setRemovido(Registro *registro, bool removido){
 void registro_setEncadeamento(Registro *registro, int encadeamento) {
     registro->encadeamento = encadeamento;
 }
+
+void exibirRegistros(FILE *arquivo) {
+    Registro registro;
+    int numeroRegistros = 0;
+    int tamanhoArquivo;
+
+    // Move o ponteiro para o final do arquivo para calcular o tamanho
+    fseek(arquivo, 0, SEEK_END);
+    tamanhoArquivo = ftell(arquivo);
+    fseek(arquivo, 0, SEEK_SET);
+
+    if (tamanhoArquivo == 0) {
+        printf("Registro inexistente.\n");
+        return;
+    }
+
+    while (fread(&registro, sizeof(Registro), 1, arquivo) == 1) {
+        // Verifica se o registro está removido
+        if (registro.removido == REGISTRO_REMOVIDO_TRUE) {
+            continue;
+        }
+
+        // Exibe os campos do registro, ignorando nulos
+        if (strlen(registro.nome) > 0) {
+            printf("Nome: %s\n", registro.nome);
+        }
+        if (strlen(registro.nEspecie) > 0) {
+            printf("Especie: %s\n", registro.nEspecie);
+        }
+        if (strlen(registro.tipo) > 0) {
+            printf("Tipo: %s\n", registro.tipo);
+        }
+        if (strlen(registro.dieta) > 0) {
+            printf("Dieta: %s\n", registro.dieta);
+        }
+        if (strlen(registro.habitat) > 0) {
+            printf("Lugar que habitava: %s\n", registro.habitat);
+        }
+        if (registro.tamanho > 0) {
+            printf("Tamanho: %.1f m\n", registro.tamanho);
+        }
+        if (registro.velocidade > 0) {
+            printf("Velocidade: %d %cm/h\n", registro.velocidade, registro.uniMedida == 'k' ? 'k' : (registro.uniMedida == 'h' ? 'h' : 'c'));
+        }
+
+        printf("\n"); // Linha em branco após cada registro
+        numeroRegistros++;
+    }
+
+    // Exibe o número de páginas de disco
+    printf("Numero de paginas de disco: %d\n", (tamanhoArquivo / REGISTRO_SIZE) + 1);
+}
