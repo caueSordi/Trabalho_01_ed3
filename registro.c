@@ -360,21 +360,21 @@ void registro_setEncadeamento(Registro *registro, int encadeamento) {
 }
 
 void exibirRegistros(FILE *arquivo) {
-    Registro registro;
-    int numeroRegistros = 0;
-    int tamanhoArquivo;
+    Registro registro; //nosso registro
+    int numeroRegistros = 0; // Contador de registros
+    int tamanhoArquivo; // Tamanho do arquivo
 
     // Move o ponteiro para o final do arquivo para calcular o tamanho
-    fseek(arquivo, 0, SEEK_END);
-    tamanhoArquivo = ftell(arquivo);
-    fseek(arquivo, 0, SEEK_SET);
+    fseek(arquivo, 0, SEEK_END); // Move o ponteiro para o final do arquivo
+    tamanhoArquivo = ftell(arquivo);      // Pega o tamanho do arquivo
+    fseek(arquivo, 0, SEEK_SET); // Move o ponteiro para o início do arquivo
 
-    if (tamanhoArquivo == 0) {
+    if (tamanhoArquivo == 0) { // Verifica se o arquivo está vazio
         printf("Registro inexistente.\n");
         return;
     }
 
-    while (fread(&registro, sizeof(Registro), 1, arquivo) == 1) {
+    while (fread(&registro, sizeof(Registro), 1, arquivo) == 1) { // Lê um registro do arquivo
         // Verifica se o registro está removido
         if (registro.removido == REGISTRO_REMOVIDO_TRUE) {
             continue;
@@ -404,7 +404,7 @@ void exibirRegistros(FILE *arquivo) {
         }
 
         printf("\n"); // Linha em branco após cada registro
-        numeroRegistros++;
+        numeroRegistros++; // Incrementa o contador de registros
     }
 
     // Exibe o número de páginas de disco
