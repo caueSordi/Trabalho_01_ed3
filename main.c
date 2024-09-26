@@ -17,10 +17,13 @@ int main()
     switch(comando){
          case 1: //CREATE TABLE
             scanf("%s %s",nomeCSV,nomearqbin);
+            printf ("nomeCSV: %s e namearqbin: %s \n",nomeCSV ,nomearqbin);
+
+
             //chamando o comando create table
             printf ("chamando o comando create table\n");
             CREATE_TABLE(nomeCSV, nomearqbin); //função que cria a tabela
-            printf ("chamando o comando create table\n");
+            printf ("chamando o comando binario na tela\n");
             binarioNaTela(nomearqbin); //função que imprime o arquivo binário
             
             break;

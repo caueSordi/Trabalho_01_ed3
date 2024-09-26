@@ -28,9 +28,11 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin){
             //escrita
             cabecalho_writebin(arquivo_binario,cabecalho); //escreve o cabeçalho no arquivo binário
             int dinosauros = 0;
+            int cont_leitura = 0;
             while (!feof(arquivo_csv)) { //salva todos os dados em dino
                 Registro *dino = registro_readcsv(arquivo_csv); //lê o registro do csv
-                
+                cont_leitura += 1;
+                printf("Registro %d lido com sucesso\n", cont_leitura);
                 // Verifica se leu corretamente o registro
                 if (dino == NULL) {
                     printf("Erro ao ler o registro do CSV\n");
@@ -45,7 +47,7 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin){
                 //escreve no arquivo binario
                 registro_writebin(arquivo_binario, dino);
                 cont += 1;
-                printf("Registro %d salvo com sucesso\n", cont);
+                //printf("Registro %d salvo com sucesso\n", cont);
                 // Liberar a memória alocada para o registro
                 free(dino->nome);
                 free(dino->dieta);

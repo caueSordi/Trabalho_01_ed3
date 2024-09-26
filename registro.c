@@ -52,7 +52,7 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
     //formatando as strings de tamanho variaveis
     // Escreve strings (sem \0, já que é um formato binário e tamanho variável) usando o tamanho de cada uma
     int tamT = 0, tamD = 0, tamA = 0, tamE = 0, tamH = 0, tam = 0;
-    int contador;
+    
     tam = strlen(registro->nome);
     tamA = strlen(registro->alimento);
     tamD = strlen(registro->dieta);
@@ -97,8 +97,7 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
         aux[i] = REGISTRO_FILL;
     }
     fwrite(aux, sizeof(char), preenche, nomebin);
-    contador++;
-    printf("Registro %d salvo com sucesso\n", contador);
+   
 
 }
 
