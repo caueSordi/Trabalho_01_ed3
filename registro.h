@@ -5,6 +5,7 @@
     #include <stdlib.h>
     #include <string.h>
     #include <stdbool.h>
+    #include <stdlib.h>
 
     #define REGISTRO_SIZE 160
     #define REGISTRO_FILL '$'

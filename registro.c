@@ -2,28 +2,29 @@
 #include "cabecalho.h"
 
 
-Registro *registro_readbin(FILE* entrada) {
+Registro *registro_readbin(FILE* entrada) { 
     Registro *registro = malloc(sizeof(Registro));
 
     if (!fread(&registro->removido, sizeof(char), 1, entrada)) {
-        registro->removido = 'E';
+        registro->removido = 'E'; // Indica que não foi possível ler o registro
+
         return registro;
     }
 
-    if (registro->removido == '1') {
+    if (registro->removido == '1') { 
         return registro;
     }
-
+ //freads para os campos de tamanho fixo
     fread(&registro->encadeamento, sizeof(int), 1, entrada);
     fread(&registro->populacao, sizeof(int), 1, entrada);
     fread(&registro->tamanho, sizeof(float), 1, entrada);
     fread(&registro->uniMedida, sizeof(char), 1, entrada);
     fread(&registro->velocidade, sizeof(int), 1, entrada);
-
+// char*linha = calloc (160, sizeof(char)); para alocar memoria
     char* linha = calloc(160, sizeof(char));
-    fgets(linha, 161 - sizeof(int) * 4 - sizeof(char) * 2, entrada);
+    fgets(linha, 161 - sizeof(int) * 4 - sizeof(char) * 2, entrada); // lê o restante da linha
 
-    registro->nome = strtok(linha, "#");
+    registro->nome = strtok(linha, "#"); // strtok para separar os campos
     registro->nEspecie = strtok(NULL, "#");
     registro->habitat = strtok(NULL, "#");
     registro->tipo = strtok(NULL, "#");
