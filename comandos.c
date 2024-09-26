@@ -27,6 +27,7 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin){
 
             //escrita
             cabecalho_writebin(arquivo_binario,cabecalho); //escreve o cabeçalho no arquivo binário
+            printf("Cabeçalho escrito com sucesso\n");
             int dinosauros = 0;
             int cont_leitura = 0;
             while (!feof(arquivo_csv)) { //salva todos os dados em dino

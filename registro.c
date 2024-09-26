@@ -64,11 +64,17 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
     
     // Escreve campos de tamanho fixo
     fwrite(&registro->removido, sizeof(char), 1, nomebin);
+    printf("removido: %c\n", registro->removido);
     fwrite(&registro->encadeamento, sizeof(int), 1, nomebin);
+    printf("encadeamento: %d\n", registro->encadeamento);
     fwrite(&registro->populacao, sizeof(int), 1, nomebin);
+    printf("populacao: %d\n", registro->populacao);
     fwrite(&registro->tamanho, sizeof(float), 1, nomebin);
+    printf("tamanho: %.2f\n", registro->tamanho);
     fwrite(&registro->uniMedida, sizeof(char), 1, nomebin);
+    printf("unidade de medida: %c\n", registro->uniMedida);
     fwrite(&registro->velocidade, sizeof(int), 1, nomebin);
+    printf("velocidade: %d\n", registro->velocidade);
     //escreve campos de tamanho variavel
     fwrite(registro->nome, sizeof(char), tam, nomebin);
     fwrite("#", sizeof(char), 1, nomebin);  // Delimitador
@@ -96,6 +102,7 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
     {
         aux[i] = REGISTRO_FILL;
     }
+
     fwrite(aux, sizeof(char), preenche, nomebin);
    
 
