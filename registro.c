@@ -99,6 +99,28 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
 
 }
 
+
+
+
+
+#define HEADER_SIZE 1600    // tamanho do cabeçalho
+
+int contar_registros(FILE *bin) {
+    // Conta o número de registros no arquivo binário
+    fseek(bin, 0, SEEK_END);
+    long file_size = ftell(bin);  // Pega o tamanho do arquivo
+    fseek(bin, 0, SEEK_SET);      // Volta para o início do arquivo
+    // Subtract the header size and divide by the size of each record
+    int num_records = (file_size - HEADER_SIZE) / REGISTRO_SIZE;
+
+    return num_records;
+}
+
+
+
+
+
+
 Registro *registro_readcsv(FILE *csv){
     Registro *registro = malloc(sizeof(Registro));
 
