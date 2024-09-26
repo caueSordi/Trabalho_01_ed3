@@ -18,28 +18,34 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin){
             }
 
             //nome das colunas
-            cabecalho_readcsv(arquivo_csv);
+            printf("Nome do arquivo csv: %s\n", nomeCSV);
+            cabecalho_readcsv(arquivo_csv); //pula a primeira linha
 
             //estrutura padrão do cabecalho
-            Cabecalho *cabecalho = cabecalho_inicializa();
+            printf("iniciando cabecalho em: %s\n", nomearqbin);
+            Cabecalho *cabecalho = cabecalho_inicializa(); //inicializa o cabeçalho
 
             //escrita
-            cabecalho_writebin(arquivo_binario,cabecalho);
-
+            cabecalho_writebin(arquivo_binario,cabecalho); //escreve o cabeçalho no arquivo binário
+            int dinosauros = 0;
             while (!feof(arquivo_csv)) { //salva todos os dados em dino
-                Registro *dino = registro_readcsv(arquivo_csv);
+                Registro *dino = registro_readcsv(arquivo_csv); //lê o registro do csv
                 
                 // Verifica se leu corretamente o registro
                 if (dino == NULL) {
                     printf("Erro ao ler o registro do CSV\n");
+                    
                     break;
                 }
+                int cont = 0;
                 
                 // Exibir as informações do registro lido
                 //registro_print(dino);
 
                 //escreve no arquivo binario
                 registro_writebin(arquivo_binario, dino);
+                cont += 1;
+                printf("Registro %d salvo com sucesso\n", cont);
                 // Liberar a memória alocada para o registro
                 free(dino->nome);
                 free(dino->dieta);

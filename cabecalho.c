@@ -3,40 +3,9 @@
 
 Cabecalho *cabecalho_readbin(FILE *file){
     // lê o cabecalho de um arquivo binário
-       Cabecalho *cabecalho = malloc(sizeof(Cabecalho));
-    if (cabecalho == NULL) {
-        fprintf(stderr, "Erro ao alocar memória para o cabecalho\n");
-        exit(EXIT_FAILURE);
-    }
-
-    fread(&cabecalho->status, sizeof(char), 1, file);
-    fread(&cabecalho->topo, sizeof(int), 1, file);
-    fread(&cabecalho->proxRRN, sizeof(int), 1, file);
-    fread(&cabecalho->nroRegRem, sizeof(int), 1, file);
-    fread(&cabecalho->nroPagDisco, sizeof(int), 1, file);
-    fread(&cabecalho->qttCompacta, sizeof(int), 1, file);
-
-    // Debug prints
-    printf("Lendo do arquivo binário:\n");
-    printf("status: %c\n", cabecalho->status);
-    printf("topo: %d\n", cabecalho->topo);
-    printf("proxRRN: %d\n", cabecalho->proxRRN);
-    printf("nroRegRem: %d\n", cabecalho->nroRegRem);
-    printf("nroPagDisco: %d\n", cabecalho->nroPagDisco);
-    printf("qttCompacta: %d\n", cabecalho->qttCompacta);
-
-    return cabecalho;
 }
 Cabecalho* cabecalho_inicializa()
 {
-
-//estrutura padrao do cabecalho
-    Cabecalho *cabecalho  = malloc(sizeof(Cabecalho));
-    if (cabecalho == NULL) {
-        fprintf(stderr, "Erro ao alocar memória para o cabecalho\n");
-        exit(EXIT_FAILURE);
-    }
-
     //estrutura padrão do cabecalho
     Cabecalho *cabecalho  = malloc(sizeof(Cabecalho));
     cabecalho->status = '0';
@@ -45,16 +14,6 @@ Cabecalho* cabecalho_inicializa()
     cabecalho->nroRegRem = 0;
     cabecalho->nroPagDisco = 0;
     cabecalho->qttCompacta = 0;
-
-        // Debug prints
-    printf("Cabecalho inicializado:\n");
-    printf("status: %c\n", cabecalho->status);
-    printf("topo: %d\n", cabecalho->topo);
-    printf("proxRRN: %d\n", cabecalho->proxRRN);
-    printf("nroRegRem: %d\n", cabecalho->nroRegRem);
-    printf("nroPagDisco: %d\n", cabecalho->nroPagDisco);
-    printf("qttCompacta: %d\n", cabecalho->qttCompacta);
-
 
     return cabecalho;
 }
@@ -81,17 +40,6 @@ void cabecalho_writebin(FILE *file, Cabecalho *cabecalho) {
     fwrite(&cabecalho->proxRRN, sizeof(int), 1, file);
     fwrite(&cabecalho->nroRegRem, sizeof(int), 1, file);
     fwrite(&cabecalho->nroPagDisco, sizeof(int), 1, file);
-
- // Debug prints
-    printf("Escrevendo no arquivo binário:\n");
-    printf("status: %c\n", cabecalho->status);
-    printf("topo: %d\n", cabecalho->topo);
-    printf("proxRRN: %d\n", cabecalho->proxRRN);
-    printf("nroRegRem: %d\n", cabecalho->nroRegRem);
-    printf("nroPagDisco: %d\n", cabecalho->nroPagDisco);
-    printf("qttCompacta: %d\n", cabecalho->qttCompacta);
-
-
 
     // Preencher o restante da página de disco com o caractere '$'
     int resto = 1600 - (4 * sizeof(int)) - sizeof(char); // Calcula o espaço restante

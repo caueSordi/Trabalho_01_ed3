@@ -11,14 +11,17 @@ int main()
 {
      int comando;
     char nomeCSV[100], nomearqbin[100];
+    printf ("Digite o comando desejado: \n");
     
     scanf("%d%*c",&comando);
     switch(comando){
          case 1: //CREATE TABLE
             scanf("%s %s",nomeCSV,nomearqbin);
             //chamando o comando create table
-            CREATE_TABLE(nomeCSV, nomearqbin);
-            binarioNaTela(nomearqbin);
+            printf ("chamando o comando create table\n");
+            CREATE_TABLE(nomeCSV, nomearqbin); //função que cria a tabela
+            printf ("chamando o comando create table\n");
+            binarioNaTela(nomearqbin); //função que imprime o arquivo binário
             
             break;
         case 2:
