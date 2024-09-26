@@ -77,13 +77,17 @@ void SELECT_TABLE(char *nomearqbin) { //vamos ver onde da bosta
         printf("Falha ao abrir o arquivo \n");
         return;
     }
-
+//sabemo que o arquivo abre
     Registro registro;  // Estrutura para armazenar um registro
-
+int conta = 0;
     // Lê registros do arquivo binário
     while (1) {
+        conta ++;
+        printf("Contador: %d\n", conta);
+        //sabemos que ele morre no while, mas passa uma vez so aqui
         Registro *dino = registro_readbin(arquivo_binario);
-        
+        printf("Passou o primeiro dino readbin\n");
+        //ele nao passa do primeiro registro_readbin (local do problema )
         // Verifica se a leitura foi bem-sucedida
         if (dino == NULL) {
             break;  // Sai do loop se não houver mais registros para ler

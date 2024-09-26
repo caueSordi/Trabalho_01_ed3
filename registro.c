@@ -2,136 +2,36 @@
 #include "cabecalho.h"
 
 
-Registro *registro_readbin(FILE *file) {
-    // Aloca espaço para um novo registro
+Registro *registro_readbin(FILE* entrada) {
     Registro *registro = malloc(sizeof(Registro));
-    if (registro == NULL) {
-        printf("Erro ao alocar memória para o registro.\n");
-        return NULL;
+
+    if (!fread(&registro->removido, sizeof(char), 1, entrada)) {
+        registro->removido = 'E';
+        return registro;
     }
 
-    Cabecalho cabecalho;
-
-    // Lê o cabeçalho do arquivo
-    if (fread(&cabecalho, sizeof(Cabecalho), 1, file) != 1) {
-        printf("Erro ao ler o cabeçalho do arquivo.\n");
-        free(registro);
-        return NULL;
+    if (registro->removido == '1') {
+        return registro;
     }
 
-    // Verifica se o arquivo está inconsistente
-    if (cabecalho.status == '0') {
-        printf("Falha no processamento do arquivo: arquivo inconsistente.\n");
-        free(registro);
-        return NULL;
-    }
+    fread(&registro->encadeamento, sizeof(int), 1, entrada);
+    fread(&registro->populacao, sizeof(int), 1, entrada);
+    fread(&registro->tamanho, sizeof(float), 1, entrada);
+    fread(&registro->uniMedida, sizeof(char), 1, entrada);
+    fread(&registro->velocidade, sizeof(int), 1, entrada);
 
-    int registros_encontrados = 0;
-    cabecalho_readbin(file);
+    char* linha = calloc(160, sizeof(char));
+    fgets(linha, 161 - sizeof(int) * 4 - sizeof(char) * 2, entrada);
 
-    // Lê os registros enquanto não chegar ao final do arquivo
-    while (!feof(file)) {
-        // Lê o campo que indica se o registro foi removido
-        if (fread(&registro->removido, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o campo removido.\n");
-            break;
-        }
+    registro->nome = strtok(linha, "#");
+    registro->nEspecie = strtok(NULL, "#");
+    registro->habitat = strtok(NULL, "#");
+    registro->tipo = strtok(NULL, "#");
+    registro->dieta = strtok(NULL, "#");
+    registro->alimento = strtok(NULL, "#");
 
-        if (registro->removido == '1') {
-            fseek(file, 160, SEEK_CUR); // Pula o registro lógico removido
-            continue;
-        }
-
-        // Lê o restante dos campos fixos
-        if (fread(&registro->encadeamento, sizeof(int), 1, file) != 1 ||
-            fread(&registro->populacao, sizeof(int), 1, file) != 1 ||
-            fread(&registro->tamanho, sizeof(float), 1, file) != 1 ||
-            fread(&registro->uniMedida, sizeof(char), 1, file) != 1 ||
-            fread(&registro->velocidade, sizeof(int), 1, file) != 1) {
-            printf("Erro ao ler os campos fixos.\n");
-            break;
-        }
-
-        printf("Início da leitura\n");
-
-        // Campos variáveis - leitura segura
-        char aux[10];  // Buffer temporário para delimitadores
-
-        if (fread(&registro->nome, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o nome.\n");
-            break;
-        }
-
-        if (fread(aux, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o delimitador do nome.\n");
-            break;
-        }
-        printf("Nome: %s\n", registro->nome);
-
-        if (fread(&registro->nEspecie, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler a espécie.\n");
-            break;
-        }
-
-        if (fread(aux, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o delimitador da espécie.\n");
-            break;
-        }
-        printf("Espécie: %s\n", registro->nEspecie);
-
-        if (fread(&registro->habitat, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o habitat.\n");
-            break;
-        }
-
-        if (fread(aux, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o delimitador do habitat.\n");
-            break;
-        }
-        printf("Habitat: %s\n", registro->habitat);
-
-        if (fread(&registro->tipo, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o tipo.\n");
-            break;
-        }
-
-        if (fread(aux, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o delimitador do tipo.\n");
-            break;
-        }
-        printf("Tipo: %s\n", registro->tipo);
-
-        if (fread(&registro->dieta, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler a dieta.\n");
-            break;
-        }
-
-        if (fread(aux, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o delimitador da dieta.\n");
-            break;
-        }
-        printf("Dieta: %s\n", registro->dieta);
-
-        if (fread(&registro->alimento, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o alimento.\n");
-            break;
-        }
-
-        if (fread(aux, sizeof(char), 1, file) != 1) {
-            printf("Erro ao ler o delimitador do alimento.\n");
-            break;
-        }
-        printf("Alimento: %s\n", registro->alimento);
-
-        registros_encontrados++;
-    }
-
-    if (registros_encontrados == 0) {
-        printf("Nenhum registro encontrado.\n");
-        free(registro);
-        return NULL;
-    }
-
+    free(linha);
+    
     return registro;
 }
 
