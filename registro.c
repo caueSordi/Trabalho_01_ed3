@@ -3,6 +3,7 @@
 
 
 Registro *registro_readbin(FILE *file) {
+    printf("Inicio da leitura\n");
     // Lê o registro de um arquivo binário
     // Não abrir o arquivo aqui, pois já foi passado como parâmetro
      Registro *registro;
@@ -23,8 +24,9 @@ Registro *registro_readbin(FILE *file) {
     // Lê os registros
     int registros_encontrados = 0;
     
-    while (fread(&registro->removido, sizeof(char), 1, file) == 1) {
+    while(!feof(file)) {
         // Verifica se o registro foi logicamente removido
+        printf("Remov: %c\n", registro->removido);
         if (registro->removido == '1') {
             fseek(file, sizeof(int) + sizeof(int) + sizeof(float) + sizeof(char) + sizeof(int), SEEK_CUR); // Pula para o próximo registro
             continue;  // Ignora registros removidos
@@ -52,7 +54,6 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
     //formatando as strings de tamanho variaveis
     // Escreve strings (sem \0, já que é um formato binário e tamanho variável) usando o tamanho de cada uma
     int tamT = 0, tamD = 0, tamA = 0, tamE = 0, tamH = 0, tam = 0;
-    
     tam = strlen(registro->nome);
     tamA = strlen(registro->alimento);
     tamD = strlen(registro->dieta);
@@ -64,17 +65,11 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
     
     // Escreve campos de tamanho fixo
     fwrite(&registro->removido, sizeof(char), 1, nomebin);
-    printf("removido: %c\n", registro->removido);
     fwrite(&registro->encadeamento, sizeof(int), 1, nomebin);
-    printf("encadeamento: %d\n", registro->encadeamento);
     fwrite(&registro->populacao, sizeof(int), 1, nomebin);
-    printf("populacao: %d\n", registro->populacao);
     fwrite(&registro->tamanho, sizeof(float), 1, nomebin);
-    printf("tamanho: %.2f\n", registro->tamanho);
     fwrite(&registro->uniMedida, sizeof(char), 1, nomebin);
-    printf("unidade de medida: %c\n", registro->uniMedida);
     fwrite(&registro->velocidade, sizeof(int), 1, nomebin);
-    printf("velocidade: %d\n", registro->velocidade);
     //escreve campos de tamanho variavel
     fwrite(registro->nome, sizeof(char), tam, nomebin);
     fwrite("#", sizeof(char), 1, nomebin);  // Delimitador
@@ -102,33 +97,9 @@ void registro_writebin(FILE *nomebin, Registro *registro){// escreve o registro 
     {
         aux[i] = REGISTRO_FILL;
     }
-
     fwrite(aux, sizeof(char), preenche, nomebin);
-   
 
 }
-
-
-
-
-
-#define HEADER_SIZE 1600    // tamanho do cabeçalho
-
-int contar_registros(FILE *bin) {
-    // Conta o número de registros no arquivo binário
-    fseek(bin, 0, SEEK_END);
-    long file_size = ftell(bin);  // Pega o tamanho do arquivo
-    fseek(bin, 0, SEEK_SET);      // Volta para o início do arquivo
-    // Subtract the header size and divide by the size of each record
-    int num_records = (file_size - HEADER_SIZE) / REGISTRO_SIZE;
-
-    return num_records;
-}
-
-
-
-
-
 
 Registro *registro_readcsv(FILE *csv){
     Registro *registro = malloc(sizeof(Registro));
@@ -245,7 +216,7 @@ Registro *registro_readcsv(FILE *csv){
     // Calcular bytes restantes para completar os 160 bytes
     // nome + dieta + habitat + tipo + especie + alimento
     // 18 = tamanho das variáveis fixas
-    registro->tam_preenchimento = 160 - ((tam + tamD + tamH + tamT + tamE + tamA)*sizeof(char) + 18);
+    registro->tam_preenchimento = 160 - ((tam + tamD + tamH + tamT + tamE + tamA)*sizeof(char) + 18+6);
 
     // Armazena o registro no arquivo binário
     registro->removido = REGISTRO_REMOVIDO_FALSE; // não removido
