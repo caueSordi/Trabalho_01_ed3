@@ -7,7 +7,7 @@
 
     #define CABECALHO_SIZE 1600
     #define CABECALHO_FILL '$'
-    #define CABECALHO_STATUS_OK 1
+    #define CABECALHO_STATUS_OK '1'
     #define CABECALHO_STATUS_INCON 0
 
     typedef struct {
