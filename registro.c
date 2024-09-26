@@ -4,32 +4,40 @@
 
 Registro *registro_readbin(FILE *file) {
     printf("Inicio da leitura\n");
-    // Lê o registro de um arquivo binário
-    // Não abrir o arquivo aqui, pois já foi passado como parâmetro
-     Registro *registro;
+
+    // Alocar memória para o registro
+    Registro *registro = (Registro *) malloc(sizeof(Registro));
+    if (registro == NULL) {
+        printf("Erro ao alocar memória para o registro.\n");
+        return NULL;
+    }
+
     Cabecalho cabecalho;
+    
     // Lê o cabeçalho do arquivo
     if (fread(&cabecalho, sizeof(Cabecalho), 1, file) != 1) {
         printf("Erro ao ler o cabeçalho do arquivo.\n");
-        return NULL;  // Retorna NULL em caso de erro
+        free(registro); // Liberar memória antes de retornar
+        return NULL;
     }
 
     if (cabecalho.status == '0') {
         printf("Falha no processamento do arquivo: arquivo inconsistente.\n");
-        return NULL;  // Retorna NULL se o cabeçalho está inconsistente
+        free(registro); // Liberar memória antes de retornar
+        return NULL;
     }
 
-    // Lê os registros
     int registros_encontrados = 0;
-    
-    while(!feof(file)) {
+
+    // Loop para ler os registros
+    while (fread(&registro->removido, sizeof(char), 1, file) == 1) {
         // Verifica se o registro foi logicamente removido
-        //printf("Remov: %c\n", registro->removido);
         if (registro->removido == '1') {
             fseek(file, sizeof(int) + sizeof(int) + sizeof(float) + sizeof(char) + sizeof(int), SEEK_CUR); // Pula para o próximo registro
             continue;  // Ignora registros removidos
         }
 
+        // Lê os dados do registro
         fread(&registro->encadeamento, sizeof(int), 1, file);
         fread(&registro->populacao, sizeof(int), 1, file);
         fread(&registro->tamanho, sizeof(float), 1, file);
@@ -37,15 +45,20 @@ Registro *registro_readbin(FILE *file) {
         fread(&registro->velocidade, sizeof(int), 1, file);
 
         registros_encontrados++; // Incrementa o contador de registros encontrados
+        
+        // Pode retornar aqui, se você quiser ler apenas o primeiro registro válido
+        break;
     }
 
     if (registros_encontrados == 0) {
         printf("Registro inexistente.\n");
-        return NULL;  // Retorna NULL se nenhum registro for encontrado
+        free(registro); // Liberar memória se nenhum registro for encontrado
+        return NULL;
     }
 
     return registro;  // Retorna o registro lido
 }
+
 
 void registro_writebin(FILE *nomebin, Registro *registro) {
     // Função para escrever o registro no arquivo binário
