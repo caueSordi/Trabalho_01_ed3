@@ -3,62 +3,137 @@
 
 
 Registro *registro_readbin(FILE *file) {
-    printf("Inicio da leitura\n");
-
-    // Alocar memória para o registro
-    Registro *registro = (Registro *) malloc(sizeof(Registro));
+    // Aloca espaço para um novo registro
+    Registro *registro = malloc(sizeof(Registro));
     if (registro == NULL) {
         printf("Erro ao alocar memória para o registro.\n");
         return NULL;
     }
 
     Cabecalho cabecalho;
-    
+
     // Lê o cabeçalho do arquivo
     if (fread(&cabecalho, sizeof(Cabecalho), 1, file) != 1) {
         printf("Erro ao ler o cabeçalho do arquivo.\n");
-        free(registro); // Liberar memória antes de retornar
+        free(registro);
         return NULL;
     }
 
+    // Verifica se o arquivo está inconsistente
     if (cabecalho.status == '0') {
         printf("Falha no processamento do arquivo: arquivo inconsistente.\n");
-        free(registro); // Liberar memória antes de retornar
+        free(registro);
         return NULL;
     }
 
     int registros_encontrados = 0;
+    cabecalho_readbin(file);
 
-    // Loop para ler os registros
-    while (fread(&registro->removido, sizeof(char), 1, file) == 1) {
-        // Verifica se o registro foi logicamente removido
-        if (registro->removido == '1') {
-            fseek(file, sizeof(int) + sizeof(int) + sizeof(float) + sizeof(char) + sizeof(int), SEEK_CUR); // Pula para o próximo registro
-            continue;  // Ignora registros removidos
+    // Lê os registros enquanto não chegar ao final do arquivo
+    while (!feof(file)) {
+        // Lê o campo que indica se o registro foi removido
+        if (fread(&registro->removido, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o campo removido.\n");
+            break;
         }
 
-        // Lê os dados do registro
-        fread(&registro->encadeamento, sizeof(int), 1, file);
-        fread(&registro->populacao, sizeof(int), 1, file);
-        fread(&registro->tamanho, sizeof(float), 1, file);
-        fread(&registro->uniMedida, sizeof(char), 1, file);
-        fread(&registro->velocidade, sizeof(int), 1, file);
+        if (registro->removido == '1') {
+            fseek(file, 160, SEEK_CUR); // Pula o registro lógico removido
+            continue;
+        }
 
-        registros_encontrados++; // Incrementa o contador de registros encontrados
-        
-        // Pode retornar aqui, se você quiser ler apenas o primeiro registro válido
-        break;
+        // Lê o restante dos campos fixos
+        if (fread(&registro->encadeamento, sizeof(int), 1, file) != 1 ||
+            fread(&registro->populacao, sizeof(int), 1, file) != 1 ||
+            fread(&registro->tamanho, sizeof(float), 1, file) != 1 ||
+            fread(&registro->uniMedida, sizeof(char), 1, file) != 1 ||
+            fread(&registro->velocidade, sizeof(int), 1, file) != 1) {
+            printf("Erro ao ler os campos fixos.\n");
+            break;
+        }
+
+        printf("Início da leitura\n");
+
+        // Campos variáveis - leitura segura
+        char aux[10];  // Buffer temporário para delimitadores
+
+        if (fread(&registro->nome, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o nome.\n");
+            break;
+        }
+
+        if (fread(aux, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o delimitador do nome.\n");
+            break;
+        }
+        printf("Nome: %s\n", registro->nome);
+
+        if (fread(&registro->nEspecie, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler a espécie.\n");
+            break;
+        }
+
+        if (fread(aux, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o delimitador da espécie.\n");
+            break;
+        }
+        printf("Espécie: %s\n", registro->nEspecie);
+
+        if (fread(&registro->habitat, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o habitat.\n");
+            break;
+        }
+
+        if (fread(aux, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o delimitador do habitat.\n");
+            break;
+        }
+        printf("Habitat: %s\n", registro->habitat);
+
+        if (fread(&registro->tipo, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o tipo.\n");
+            break;
+        }
+
+        if (fread(aux, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o delimitador do tipo.\n");
+            break;
+        }
+        printf("Tipo: %s\n", registro->tipo);
+
+        if (fread(&registro->dieta, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler a dieta.\n");
+            break;
+        }
+
+        if (fread(aux, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o delimitador da dieta.\n");
+            break;
+        }
+        printf("Dieta: %s\n", registro->dieta);
+
+        if (fread(&registro->alimento, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o alimento.\n");
+            break;
+        }
+
+        if (fread(aux, sizeof(char), 1, file) != 1) {
+            printf("Erro ao ler o delimitador do alimento.\n");
+            break;
+        }
+        printf("Alimento: %s\n", registro->alimento);
+
+        registros_encontrados++;
     }
 
     if (registros_encontrados == 0) {
-        printf("Registro inexistente.\n");
-        free(registro); // Liberar memória se nenhum registro for encontrado
+        printf("Nenhum registro encontrado.\n");
+        free(registro);
         return NULL;
     }
 
-    return registro;  // Retorna o registro lido
+    return registro;
 }
-
 
 void registro_writebin(FILE *nomebin, Registro *registro) {
     // Função para escrever o registro no arquivo binário

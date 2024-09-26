@@ -71,7 +71,7 @@ void CREATE_TABLE(char *nomeCSV, char *nomearqbin, Cabecalho *cabecalho){
             fclose(arquivo_binario);
 }   
 
-void SELECT_TABLE(char *nomearqbin) {
+void SELECT_TABLE(char *nomearqbin) { //vamos ver onde da bosta
     FILE *arquivo_binario = fopen(nomearqbin, "rb");
     if (arquivo_binario == NULL) {
         printf("Falha ao abrir o arquivo \n");
