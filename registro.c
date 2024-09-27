@@ -364,8 +364,32 @@ void registro_remover( char *nomearqbin, int rrn)
         return;
     }
     // definir string auxiliares para remoção
+    char* key = calloc(11, sizeof(char));
+    char* pega = calloc(160, sizeof(char));
+    int endereco = 0;    //endereco de busca
 
-    //id de busca
+
+
+    for(int i = 0; i < rrn; i++){
+        scanf("%s", key);
+        endereco =  procurar(key);
+
+        if(endereco == -1){
+            printf("Registro não encontrado\n");
+            continue;
+        }
+        if (endereco == 1 || endereco == 2) {
+            scan_quote_string(pega);
+        }
+        if (endereco == 3) {
+            scanf("%s*c", pega);
+        }
+
+        
+    }
+
+
+ 
 
     //para cada commando dado (for)
 

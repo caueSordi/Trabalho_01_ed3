@@ -112,3 +112,62 @@ void SELECT_WHERE(char *nome, char *campo, char *valor)
 {
 
 }
+
+int procurar(char* comando)
+{
+// 1 LIDA COM NUMEROS INTEIROS 
+// 2 LIDA COM FLOAT (NUMEROS DECIMAIS)
+// 3 LIDA COM STRINGS (NAO NUMEROS)
+    // populacao, unidade e velocidade  sao numeros inteiros
+    if(strcmp(comando, "populacao") == 0)
+    {
+        return 1;
+    }
+    if(strcmp(comando, "unidade") == 0)
+    {
+        return 1;
+    }
+    if(strcmp(comando, "velocidade") == 0)
+    {
+        return 1;
+    }
+
+
+    // o tamanho e um float
+    if(strcmp(comando, "tamanho") == 0)
+    {
+        return 2;
+    }
+
+
+    // apartir daqui estamos lidando com string que (NAO SAO NUMEROS)
+    if(strcmp(comando, "nome") == 0)
+    {
+        return 3;
+    }
+    if(strcmp(comando, "dieta") == 0)
+    {
+        return 3;
+    }
+    if(strcmp(comando, "alimento") == 0)
+    {
+        return 3;
+    }
+    if(strcmp(comando, "habitat") == 0)
+    {
+        return 3;
+    }
+        if(strcmp(comando, "especie") == 0)
+    {
+        return 3;
+    }
+    if(strcmp(comando, "tipo") == 0)
+    {
+        return 3;
+    }
+
+
+
+   // se tiver errado nao ha santo que resolva tbm
+    return -1;
+}
