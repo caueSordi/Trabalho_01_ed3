@@ -1,3 +1,4 @@
+
 #ifndef REGISTRO_H
     #define REGISTRO_H
     
@@ -6,6 +7,7 @@
     #include <string.h>
     #include <stdbool.h>
     #include <stdlib.h>
+    #include "cabecalho.h"
 
     #define REGISTRO_SIZE 160
     #define REGISTRO_FILL '$'
@@ -39,6 +41,9 @@
     Registro *registro_readbin(FILE *file);
     void registro_writebin(FILE *file, Registro *registro);
     Registro *registro_readcsv(FILE *csv);
+
+    //Função para  remover o registro
+    void registro_remover(char *nomearqbin, int rrn);
 
     // Função para imprimir os dados do registro
     void registro_print(Registro *registro);

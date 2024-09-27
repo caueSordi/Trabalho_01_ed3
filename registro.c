@@ -11,7 +11,7 @@ Registro *registro_readbin(FILE* entrada) {
         return registro;
     }
 
-    if (registro->removido == '1') { 
+    if (registro->removido == '1') {
         return registro;
     }
  //freads para os campos de tamanho fixo
@@ -208,7 +208,7 @@ Registro *registro_readcsv(FILE *csv) {
 
 void registro_print(Registro *registro){
 
-
+    
     printf("Nome: %s\n", registro->nome);
     printf("Especie: %s\n", registro->nEspecie);
 
@@ -230,7 +230,7 @@ void registro_print(Registro *registro){
         printf("Velocidade: %d %cm/h\n", registro->velocidade, registro->uniMedida);
     }
     printf("\n");
-
+    
 }
 
 bool registro_field(char *nome_campo){
@@ -243,6 +243,7 @@ void registro_remove(Registro *registro){
 
 bool registro_isValid(Registro *registro){
     // retorna true caso o registro não seja removido
+    return registro->removido == REGISTRO_REMOVIDO_FALSE;
 }
 
 
@@ -353,3 +354,18 @@ void registro_setRemovido(Registro *registro, bool removido){
 void registro_setEncadeamento(Registro *registro, int encadeamento) {
     registro->encadeamento = encadeamento;
 }
+
+void registro_remover( char *nomearqbin, int rrn)
+{
+    FILE *arquivo_binario = fopen(nomearqbin, "r+b");
+    if (arquivo_binario == NULL) {
+        printf("Falha ao abrir o arquivo \n");
+        return;
+    }
+
+
+
+
+    
+}
+
