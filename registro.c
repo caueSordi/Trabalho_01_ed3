@@ -3,7 +3,7 @@
 
 
 Registro *registro_readbin(FILE* entrada) { 
-    Registro *registro = malloc(sizeof(Registro));
+      Registro *registro = cria_registro();
 
     if (!fread(&registro->removido, sizeof(char), 1, entrada)) {
         registro->removido = 'E'; // Indica que não foi possível ler o registro
@@ -24,16 +24,36 @@ Registro *registro_readbin(FILE* entrada) {
     char* linha = calloc(160, sizeof(char));
     fgets(linha, 161 - sizeof(int) * 4 - sizeof(char) * 2, entrada); // lê o restante da linha
 
-    registro->nome = strtok(linha, "#"); // strtok para separar os campos
-    registro->nEspecie = strtok(NULL, "#");
-    registro->habitat = strtok(NULL, "#");
-    registro->tipo = strtok(NULL, "#");
-    registro->dieta = strtok(NULL, "#");
-    registro->alimento = strtok(NULL, "#");
+    strcpy (registro->nome , strsep(&linha, "#")); // strtok para separar os campos e delimitador
+    strcpy (registro->nEspecie , strsep(&linha, "#"));
+    strcpy (registro->habitat , strsep(&linha, "#"));
+    strcpy (registro->tipo , strsep(&linha, "#"));
+    strcpy (registro->dieta , strsep(&linha, "#"));
+    strcpy (registro->alimento , strsep(&linha, "#"));
 
-    free(linha);
+    //free(linha);
     
     return registro;
+}
+
+Registro* cria_registro ()
+{
+    Registro *registro  = malloc(sizeof(Registro));
+    registro -> removido = '0';
+    registro -> encadeamento = -1;
+    registro -> populacao = -1;
+    registro -> tamanho = -1;
+    registro -> uniMedida = '$';
+    registro -> velocidade = -1;
+    registro -> nome = calloc (160, sizeof(char));
+    registro -> nEspecie = calloc (160, sizeof(char));
+    registro -> habitat = calloc (160, sizeof(char));
+    registro -> tipo = calloc (160, sizeof(char));
+    registro -> dieta = calloc (160, sizeof(char));
+    registro -> alimento = calloc (160, sizeof(char));
+
+    return registro;
+
 }
 
 void registro_writebin(FILE *nomebin, Registro *registro) {
@@ -187,16 +207,30 @@ Registro *registro_readcsv(FILE *csv) {
 
 
 void registro_print(Registro *registro){
+
+
     printf("Nome: %s\n", registro->nome);
+    printf("Especie: %s\n", registro->nEspecie);
+
+    if(strcmp(registro->tipo, "") != 0){
+        printf("Tipo: %s\n", registro->tipo);
+    }
+
+   
     printf("Dieta: %s\n", registro->dieta);
-    printf("Habitat: %s\n", registro->habitat);
-    printf("População: %d\n", registro->populacao);
-    printf("Tipo: %s\n", registro->tipo);
-    printf("Velocidade: %d %c/h\n", registro->velocidade, registro->uniMedida);
-    printf("Tamanho: %.2f\n", registro->tamanho);
-    printf("Espécie: %s\n", registro->nEspecie);
-    printf("Alimento: %s\n", registro->alimento);
+    
+    if(strcmp(registro->habitat, "") != 0){
+        printf("Lugar que habitava: %s\n", registro->habitat);
+    }
+
+    if(registro->tamanho != -1){
+        printf("Tamanho: %.1f m\n", registro->tamanho);
+    }
+    if (registro->velocidade != -1 && registro->uniMedida != '$'){
+        printf("Velocidade: %d %cm/h\n", registro->velocidade, registro->uniMedida);
+    }
     printf("\n");
+
 }
 
 bool registro_field(char *nome_campo){

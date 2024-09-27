@@ -33,6 +33,7 @@
 
     } Registro;
     
+    Registro* cria_registro();
 
     // Funções de leitura e escrita binária
     Registro *registro_readbin(FILE *file);

@@ -79,21 +79,25 @@ void SELECT_TABLE(char *nomearqbin) { //vamos ver onde da bosta
     }
 //sabemo que o arquivo abre
     Registro registro;  // Estrutura para armazenar um registro
-int conta = 0;
+
+
+    fseek (arquivo_binario, 1600, SEEK_SET);
     // Lê registros do arquivo binário
     while (1) {
-        conta ++;
-        printf("Contador: %d\n", conta);
+        
         //sabemos que ele morre no while, mas passa uma vez so aqui
-        Registro *dino = registro_readbin(arquivo_binario);
-        printf("Passou o primeiro dino readbin\n");
+        Registro *registro = registro_readbin(arquivo_binario);
+    
+        
         //ele nao passa do primeiro registro_readbin (local do problema )
         // Verifica se a leitura foi bem-sucedida
-        if (dino == NULL) {
+        if (registro->removido == 'E') {
             break;  // Sai do loop se não houver mais registros para ler
         }
-        
-        registro_print(dino);  // Imprime o registro lido
+        if(registro->removido == '1'){
+            continue;
+        }
+        registro_print(registro);  // Imprime o registro lido
     }
 
     fclose(arquivo_binario); 
