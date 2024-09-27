@@ -369,11 +369,13 @@ void registro_remover( char *nomearqbin, int rrn)
     int endereco = 0;    //endereco de busca
 
 
+    printf("Número de registros removidos: %d\n", rrn);
 
     for(int i = 0; i < rrn; i++){
         scanf("%s", key);
         endereco =  procurar(key);
-
+        printf("Endereço: %d\n", endereco);
+        
         if(endereco == -1){
             printf("Registro não encontrado\n");
             continue;
@@ -385,7 +387,7 @@ void registro_remover( char *nomearqbin, int rrn)
             scanf("%s*c", pega);
         }
 
-        
+
     }
 
 
