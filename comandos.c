@@ -126,6 +126,7 @@ int SELECT_WHERE(char *nome, char *campo) {
     int cont_registro = 0;
 
     while (1) {
+        printf("cont_registro: %d\n", cont_registro);
         registro = registro_readbin(arquivo_binario);
         if (registro == NULL) {
             break; // Sai do loop se não houver mais registros
@@ -134,23 +135,29 @@ int SELECT_WHERE(char *nome, char *campo) {
             fseek(arquivo_binario, 1600 + REGISTRO_SIZE * (cont_registro), SEEK_SET);
             free(registro); // Libera memória do registro lido antes de continuar
             cont_registro++;
-            continue;
-        }
+            continue; // Pula para o próximo registro e volta para o início do loop
+        }//se achar um registro valido
 
         // Verificação do tipo da variável que deve-se buscar no arquivo binário
         int teste = verificacaoString(campo);
         if (teste == 0 || teste == 1 || teste == 2 || teste == 3 || teste == 4 || teste == 5) {
             char valor[100];
             scan_quote_string(valor); // Leitura para o caso de string
-            registro_busca_elemento(valor, -1, -1.0f, registro);
+            printf("valor: %s\n", valor);
+            registro_busca_elemento(valor, -1, -1.0f,campo, arquivo_binario);
+            printf("passou do primeiro registro_busca_elemento\n");
         } else if (teste == 6 || teste == 7) {
+            printf("passou aqui pelo teste 6 e 7\n");
             int valorint;
             scanf("%d", &valorint); // Leitura para o caso de inteiro
-            registro_busca_elemento(NULL, valorint, -1.0f, registro);
+            printf("valor: %d\n", valorint);
+            registro_busca_elemento(NULL, valorint, -1.0f, campo,arquivo_binario);
+            //void registro_busca_elemento(char *valor, int valorint, float valorf, char *campo, FILE *binario) {
+
         } else if (teste == 8) {
             float valorf;
             scanf("%f", &valorf); // Leitura para o caso de float
-            registro_busca_elemento(NULL, -1, valorf, registro);
+            registro_busca_elemento(NULL, -1, valorf, campo, arquivo_binario);
         } else if (teste == -1) { // Campo inválido
             free(registro);
             break;

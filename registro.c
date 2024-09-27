@@ -232,25 +232,53 @@ void registro_print(Registro *registro){
     printf("\n");
     
 }
-void registro_busca_elemento(char *valor, int valorint, float valorf, Registro *registro) {
-    if (valor != NULL && strcmp(registro->nome, valor) == 0) {
-        registro_print(registro);
-    } else if (valor != NULL && strcmp(registro->nEspecie, valor) == 0) {
-        registro_print(registro);
-    } else if (valor != NULL && strcmp(registro->alimento, valor) == 0) {
-        registro_print(registro);
-    } else if (valor != NULL && strcmp(registro->dieta, valor) == 0) {
-        registro_print(registro);
-    } else if (valor != NULL && strcmp(registro->tipo, valor) == 0) {
-        registro_print(registro);
-    } else if (valor != NULL && strcmp(registro->habitat, valor) == 0) {
-        registro_print(registro);
-    } else if (registro->populacao == valorint) {
-        registro_print(registro);
-    } else if (registro->velocidade == valorint) {
-        registro_print(registro);
-    } else if (registro->tamanho == valorf) {
-        registro_print(registro);
+void registro_busca_elemento(char *valor, int valorint, float valorf, char *campo, FILE *binario) {
+    // Move o ponteiro para o início do arquivo
+    fseek(binario, 0, SEEK_SET);
+
+    // Lê o cabeçalho para obter o número de registros
+    Cabecalho cabecalho;
+    fread(&cabecalho, sizeof(Cabecalho), 1, binario);
+
+    // Loop para percorrer todos os registros
+    for (int rrn = 0; rrn < cabecalho.proxRRN; rrn++) {
+        // Calcula o offset do registro no arquivo binário
+        int offset = sizeof(Cabecalho) + rrn * sizeof(Registro);
+        fseek(binario, offset, SEEK_SET);
+
+        // Lê o registro do arquivo binário
+        Registro *registro = registro_readbin(binario);
+
+        if (registro_isValid(registro)) {
+            if (valor != NULL && strcmp(registro->nome, valor) == 0 && strcmp("nome", campo) == 0) {
+                registro_print(registro);
+            } else if (valor != NULL && strcmp(registro->nEspecie, valor) == 0 && strcmp("especie", campo) == 0) {
+                registro_print(registro);
+            } else if (valor != NULL && strcmp(registro->alimento, valor) == 0 && strcmp("alimento", campo) == 0) {
+                registro_print(registro);
+            } else if (valor != NULL && strcmp(registro->dieta, valor) == 0 && strcmp("dieta", campo) == 0) {
+                registro_print(registro);
+            } else if (valor != NULL && strcmp(registro->tipo, valor) == 0 && strcmp("tipo", campo) == 0) {
+                registro_print(registro);
+            } else if (valor != NULL && strcmp(registro->habitat, valor) == 0 && strcmp("habitat", campo) == 0) {
+                registro_print(registro);
+            } else if (registro->populacao == valorint && strcmp("populacao", campo) == 0) {
+                registro_print(registro);
+            } else if (registro->velocidade == valorint && strcmp("velocidade", campo) == 0) {
+                registro_print(registro);
+            } else if (registro->tamanho == valorf && strcmp("tamanho", campo) == 0) {
+                registro_print(registro);
+            }
+        }
+
+        // Libera a memória alocada para o registro
+        free(registro->nome);
+        free(registro->nEspecie);
+        free(registro->habitat);
+        free(registro->tipo);
+        free(registro->dieta);
+        free(registro->alimento);
+        free(registro);
     }
 }
 

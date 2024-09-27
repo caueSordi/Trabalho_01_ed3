@@ -37,7 +37,7 @@ int main()
             scanf("%s %d", nomearquivo, &quant); // Leitura do nome do arquivo e a quantidade
 
             int i = 0;
-            while (i != quant) {
+            while (i < quant) {
                 char nomecampo[100];
                 // Lê o nome do campo
                 scanf("%s", nomecampo);
