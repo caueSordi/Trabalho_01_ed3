@@ -357,12 +357,48 @@ void registro_setEncadeamento(Registro *registro, int encadeamento) {
 
 void registro_remover( char *nomearqbin, int rrn)
 {
+    //abrir aqruivo binario
     FILE *arquivo_binario = fopen(nomearqbin, "r+b");
     if (arquivo_binario == NULL) {
         printf("Falha ao abrir o arquivo \n");
         return;
     }
+    // definir string auxiliares para remoção
 
+    //id de busca
+
+    //para cada commando dado (for)
+
+        //pega comando
+        //switch
+        //     Se o tipo de busca for uma string
+//         Ler o valor entre aspas
+//     Se não
+//         Ler o valor sem aspas
+
+//     Verificar se o atributo é inválido
+//         Se for inválido, avisar e continuar para o próximo comando
+
+//     Encontrar o RRN do primeiro registro com o valor procurado
+//     Enquanto houver um registro encontrado (RRN != -1)
+//         Avançar para o início do registro
+//         Marcar o registro como removido logicamente
+//         Salvar o RRN do registro removido anteriormente
+//         Substituir o restante do registro por lixo
+
+//         Aumentar a quantidade de registros removidos
+//         Atualizar o RRN do último registro removido
+
+//         Procurar o próximo registro com o valor procurado
+
+//     Liberar as strings auxiliares após o loop
+
+//     Reiniciar variáveis auxiliares para o próximo comando
+
+// Liberar as strings auxiliares finais
+
+// Fechar o arquivo, atualizando o cabeçalho
+// Chamar a função de verificação do projeto
 
 
 
