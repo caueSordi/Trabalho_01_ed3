@@ -232,6 +232,53 @@ void registro_print(Registro *registro){
     printf("\n");
     
 }
+void registro_busca_elemento(char *valor, int valorint, float valorf, Registro *registro) {
+    if (valor != NULL && strcmp(registro->nome, valor) == 0) {
+        registro_print(registro);
+    } else if (valor != NULL && strcmp(registro->nEspecie, valor) == 0) {
+        registro_print(registro);
+    } else if (valor != NULL && strcmp(registro->alimento, valor) == 0) {
+        registro_print(registro);
+    } else if (valor != NULL && strcmp(registro->dieta, valor) == 0) {
+        registro_print(registro);
+    } else if (valor != NULL && strcmp(registro->tipo, valor) == 0) {
+        registro_print(registro);
+    } else if (valor != NULL && strcmp(registro->habitat, valor) == 0) {
+        registro_print(registro);
+    } else if (registro->populacao == valorint) {
+        registro_print(registro);
+    } else if (registro->velocidade == valorint) {
+        registro_print(registro);
+    } else if (registro->tamanho == valorf) {
+        registro_print(registro);
+    }
+}
+
+int verificacaoString(char *campo) {
+    // Verifica o tipo do campo e retorna a posição
+    if (strcmp("nome", campo) == 0) {
+        return 0; // Retorna 0 para 'nome'
+    } else if (strcmp("especie", campo) == 0) {
+        return 1; // Retorna 1 para 'especie'
+    } else if (strcmp("habitat", campo) == 0) {
+        return 2; // Retorna 2 para 'habitat'
+    } else if (strcmp("tipo", campo) == 0) {
+        return 3; // Retorna 3 para 'tipo'
+    } else if (strcmp("dieta", campo) == 0) {
+        return 4; // Retorna 4 para 'dieta'
+    } else if (strcmp("alimento", campo) == 0) {
+        return 5; // Retorna 5 para 'alimento'
+    } else if (strcmp("velocidade", campo) == 0) {
+        return 6;
+    } else if (strcmp("populacao", campo) == 0) {
+        return 7;
+    } else if (strcmp("tamanho", campo) == 0) {
+        return 8;
+    } else {
+        printf("Campo inexistente.\n");
+        return -1; // Campo inexistente
+    }
+}
 
 bool registro_field(char *nome_campo){
     // retorna se é um campo de string ou inteiro
@@ -354,80 +401,3 @@ void registro_setRemovido(Registro *registro, bool removido){
 void registro_setEncadeamento(Registro *registro, int encadeamento) {
     registro->encadeamento = encadeamento;
 }
-
-void registro_remover( char *nomearqbin, int rrn)
-{
-    //abrir aqruivo binario
-    FILE *arquivo_binario = fopen(nomearqbin, "r+b");
-    if (arquivo_binario == NULL) {
-        printf("Falha ao abrir o arquivo \n");
-        return;
-    }
-    // definir string auxiliares para remoção
-    char* key = calloc(11, sizeof(char));
-    char* pega = calloc(160, sizeof(char));
-    int endereco = 0;    //endereco de busca
-
-
-    printf("Número de registros removidos: %d\n", rrn);
-
-    for(int i = 0; i < rrn; i++){
-        scanf("%s", key);
-        endereco =  procurar(key);
-        printf("Endereço: %d\n", endereco);
-        
-        if(endereco == -1){
-            printf("Registro não encontrado\n");
-            continue;
-        }
-        if (endereco == 1 || endereco == 2) {
-            scan_quote_string(pega);
-        }
-        if (endereco == 3) {
-            scanf("%s*c", pega);
-        }
-
-
-    }
-
-
- 
-
-    //para cada commando dado (for)
-
-        //pega comando
-        //switch
-        //     Se o tipo de busca for uma string
-//         Ler o valor entre aspas
-//     Se não
-//         Ler o valor sem aspas
-
-//     Verificar se o atributo é inválido
-//         Se for inválido, avisar e continuar para o próximo comando
-
-//     Encontrar o RRN do primeiro registro com o valor procurado
-//     Enquanto houver um registro encontrado (RRN != -1)
-//         Avançar para o início do registro
-//         Marcar o registro como removido logicamente
-//         Salvar o RRN do registro removido anteriormente
-//         Substituir o restante do registro por lixo
-
-//         Aumentar a quantidade de registros removidos
-//         Atualizar o RRN do último registro removido
-
-//         Procurar o próximo registro com o valor procurado
-
-//     Liberar as strings auxiliares após o loop
-
-//     Reiniciar variáveis auxiliares para o próximo comando
-
-// Liberar as strings auxiliares finais
-
-// Fechar o arquivo, atualizando o cabeçalho
-// Chamar a função de verificação do projeto
-
-
-
-    
-}
-
