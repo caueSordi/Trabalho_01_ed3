@@ -233,40 +233,76 @@ void registro_print(Registro *registro){
     
 }
 void registro_busca_elemento(char *valor, int valorint, float valorf, char *campo, FILE *binario) {
+    // Verificar os argumentos da função
+    printf("Argumentos da função:\n");
+    printf("valor: %s\n", valor);
+    printf("valorint: %d\n", valorint);
+    printf("valorf: %f\n", valorf);
+    printf("campo: %s\n", campo);
+    printf("binario: %p\n", (void*)binario);
+
     // Move o ponteiro para o início do arquivo
     fseek(binario, 0, SEEK_SET);
 
     // Lê o cabeçalho para obter o número de registros
     Cabecalho cabecalho;
-    fread(&cabecalho, sizeof(Cabecalho), 1, binario);
+    if (fread(&cabecalho, sizeof(Cabecalho), 1, binario) != 1) {
+        fprintf(stderr, "Erro ao ler o cabeçalho.\n");
+        return;
+    }
+    printf("Cabecalho lido: proxRRN = %d\n", cabecalho.proxRRN);
+
+    // Verificar se há registros para ler
+    if (cabecalho.proxRRN == 0) {
+        printf("Nenhum registro encontrado.\n");
+        return;
+    }
 
     // Loop para percorrer todos os registros
     for (int rrn = 0; rrn < cabecalho.proxRRN; rrn++) {
         // Calcula o offset do registro no arquivo binário
         int offset = sizeof(Cabecalho) + rrn * sizeof(Registro);
         fseek(binario, offset, SEEK_SET);
+        printf("Lendo registro no offset %d\n", offset);
 
         // Lê o registro do arquivo binário
         Registro *registro = registro_readbin(binario);
+        if (registro == NULL) {
+            fprintf(stderr, "Erro ao ler o registro no RRN %d.\n", rrn);
+            continue;
+        }
+
+        // Debug print do registro lido
+        printf("Registro lido no RRN %d: nome=%s, especie=%s, alimento=%s, dieta=%s, tipo=%s, habitat=%s, populacao=%d, velocidade=%d, tamanho=%f\n",
+               rrn, registro->nome, registro->nEspecie, registro->alimento, registro->dieta, registro->tipo, registro->habitat, registro->populacao, registro->velocidade, registro->tamanho);
 
         if (registro_isValid(registro)) {
-            if (valor != NULL && strcmp(registro->nome, valor) == 0 && strcmp("nome", campo) == 0) {
-                registro_print(registro);
-            } else if (valor != NULL && strcmp(registro->nEspecie, valor) == 0 && strcmp("especie", campo) == 0) {
-                registro_print(registro);
-            } else if (valor != NULL && strcmp(registro->alimento, valor) == 0 && strcmp("alimento", campo) == 0) {
-                registro_print(registro);
-            } else if (valor != NULL && strcmp(registro->dieta, valor) == 0 && strcmp("dieta", campo) == 0) {
-                registro_print(registro);
-            } else if (valor != NULL && strcmp(registro->tipo, valor) == 0 && strcmp("tipo", campo) == 0) {
-                registro_print(registro);
-            } else if (valor != NULL && strcmp(registro->habitat, valor) == 0 && strcmp("habitat", campo) == 0) {
-                registro_print(registro);
-            } else if (registro->populacao == valorint && strcmp("populacao", campo) == 0) {
-                registro_print(registro);
-            } else if (registro->velocidade == valorint && strcmp("velocidade", campo) == 0) {
-                registro_print(registro);
-            } else if (registro->tamanho == valorf && strcmp("tamanho", campo) == 0) {
+            bool match = false;
+            printf("Comparando campo: %s\n", campo);
+            if (valor != NULL) {
+                if (strcmp(campo, "nome") == 0 && strcmp(registro->nome, valor) == 0) {
+                    match = true;
+                } else if (strcmp(campo, "especie") == 0 && strcmp(registro->nEspecie, valor) == 0) {
+                    match = true;
+                } else if (strcmp(campo, "alimento") == 0 && strcmp(registro->alimento, valor) == 0) {
+                    match = true;
+                } else if (strcmp(campo, "dieta") == 0 && strcmp(registro->dieta, valor) == 0) {
+                    match = true;
+                } else if (strcmp(campo, "tipo") == 0 && strcmp(registro->tipo, valor) == 0) {
+                    match = true;
+                } else if (strcmp(campo, "habitat") == 0 && strcmp(registro->habitat, valor) == 0) {
+                    match = true;
+                }
+            } else if (strcmp(campo, "populacao") == 0 && registro->populacao == valorint) {
+                match = true;
+            } else if (strcmp(campo, "velocidade") == 0 && registro->velocidade == valorint) {
+                match = true;
+            } else if (strcmp(campo, "tamanho") == 0 && registro->tamanho == valorf) {
+                match = true;
+            }
+
+            if (match) {
+                printf("Registro encontrado:\n");
                 registro_print(registro);
             }
         }
@@ -281,7 +317,6 @@ void registro_busca_elemento(char *valor, int valorint, float valorf, char *camp
         free(registro);
     }
 }
-
 int verificacaoString(char *campo) {
     // Verifica o tipo do campo e retorna a posição
     if (strcmp("nome", campo) == 0) {
